@@ -1,114 +1,120 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
+import 'react-native-gesture-handler';
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import { NavigationContainer, } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+// Icons
+import Icon from 'react-native-vector-icons/FontAwesome';
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>YoComproAdmin</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
-};
 
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
+//Some elements from react-native.
+import {StyleSheet, View, Platform, Alert, Linking, Text} from 'react-native';
 
-export default App;
+import Splash from '@screens/Splash';
+import Login from '@screens/Login';
+import FetchLoginInfo from '@src/FetchLoginInfo';
+
+// For async storage...
+import AsyncStorage from '@react-native-community/async-storage';
+
+
+const verifyingUser = () => {
+  let returning = false;
+
+  AsyncStorage.getItem('user_id').then((value) => {
+    if (value === null) {
+      // setStateLogin(true);
+
+    } else {
+      returning = true;
+    }
+  });
+
+  return returning;
+}
+
+export default class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      initialRoute: 'Cuenta', 
+      userValidation: false, 
+      stateLogin: false,
+      userStatus: false,
+      infoLogin: []
+    };
+  }
+
+  
+  async componentDidMount(){
+    await setTimeout(() => {
+      this.verifyingUserIdentity();  
+    }, 2000, this);
+    
+    
+  }
+
+  async verifyingUserIdentity(){
+    let result = verifyingUser();
+
+    let inf = await FetchLoginInfo();
+    
+    this.setState({ infoLogin: inf });
+
+    if (result === false) {
+      this.setState({
+        stateLogin: true, 
+        userValidation: true
+      });
+    }
+
+  }
+
+  render() {
+    if (this.state.userValidation === false) {
+      return ( <Splash />);
+    }
+    else if (this.state.stateLogin === true){
+      return (
+        <Login dataLogin={this.state.infoLogin} {...this.props}/>
+      );
+    }
+    else {
+      
+      return ( <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><Text>Aqui va el react navigation</Text></View>);
+      
+    }
+  }
+}
+
+// const App = (props) => {
+
+//   const [initialRoute, setInitialRoute] = React.useState('Cuenta');
+//   const [userValidation, setUserValidation] = React.useState(false);
+//   const [stateLogin, setStateLogin] = React.useState(false);
+
+//   let variable = verifyingUser();
+
+//   console.log('esta es la verifying... ', variable);
+
+//   if (variable === false) {setStateLogin(true); setUserValidation(true);}
+
+//   if (userValidation === false) {
+//     return ( <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><Text>Aqui va el splash</Text></View>);
+//   }
+//   else if (stateLogin === true){
+//     return (
+//       <Login {...props}/>
+//     );
+//   }
+//   else {
+    
+//     return ( <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><Text>Aqui va el react navigation</Text></View>);
+    
+//   }
+// };
+
+
+//export default App;
