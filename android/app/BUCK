@@ -35,12 +35,20 @@ android_library(
 
 android_build_config(
     name = "build_config",
+<<<<<<< HEAD
     package = "com.yocomproadmin",
+=======
+    package = "com.tmproject",
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
 )
 
 android_resource(
     name = "res",
+<<<<<<< HEAD
     package = "com.yocomproadmin",
+=======
+    package = "com.tmproject",
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
     res = "src/main/res",
 )
 

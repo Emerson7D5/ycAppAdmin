@@ -1,4 +1,8 @@
 apply plugin: "com.android.application"
+<<<<<<< HEAD
+=======
+apply plugin: 'com.google.gms.google-services'
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
 
 import com.android.build.OutputFile
 
@@ -81,6 +85,30 @@ project.ext.react = [
     enableHermes: false,  // clean and rebuild if changing
 ]
 
+<<<<<<< HEAD
+=======
+project.ext {
+  set('react-native', [
+    versions: [
+      // Overriding Build/Android SDK Versions
+      android : [
+        minSdk    : 16,
+        targetSdk : 29,
+        compileSdk: 29,
+        buildTools: "29.0.3"
+      ],
+
+      // Overriding Library SDK Versions
+      firebase: [
+        // Override Firebase SDK Version
+        bom           : "25.7.0"
+      ],
+    ],
+  ])
+}
+
+
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
 apply from: "../../node_modules/react-native/react.gradle"
 
 /**
@@ -129,11 +157,19 @@ android {
     }
 
     defaultConfig {
+<<<<<<< HEAD
         applicationId "com.yocomproadmin"
+=======
+        applicationId "com.tmproject"
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+<<<<<<< HEAD
+=======
+        multiDexEnabled true
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
     }
     splits {
         abi {
@@ -187,6 +223,13 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
+<<<<<<< HEAD
+=======
+    implementation 'com.google.firebase:firebase-analytics:17.5.0'
+
+    implementation 'com.google.firebase:firebase-messaging:20.2.4'
+
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
     }

@@ -3,12 +3,20 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '10.0'
 
+<<<<<<< HEAD
 target 'YoComproAdmin' do
+=======
+target 'TMProject' do
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
   config = use_native_modules!
 
   use_react_native!(:path => config["reactNativePath"])
 
+<<<<<<< HEAD
   target 'YoComproAdminTests' do
+=======
+  target 'TMProjectTests' do
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
     inherit! :complete
     # Pods for testing
   end
@@ -23,10 +31,17 @@ target 'YoComproAdmin' do
   end
 end
 
+<<<<<<< HEAD
 target 'YoComproAdmin-tvOS' do
   # Pods for YoComproAdmin-tvOS
 
   target 'YoComproAdmin-tvOSTests' do
+=======
+target 'TMProject-tvOS' do
+  # Pods for TMProject-tvOS
+
+  target 'TMProject-tvOSTests' do
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
     inherit! :search_paths
     # Pods for testing
   end

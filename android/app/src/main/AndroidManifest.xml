@@ -1,5 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<<<<<<< HEAD
   package="com.yocomproadmin">
+=======
+  package="com.tmproject">
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -20,6 +24,15 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
+<<<<<<< HEAD
+=======
+        <intent-filter>
+          <action android:name="android.intent.action.VIEW" />
+          <category android:name="android.intent.category.DEFAULT" />
+          <category android:name="android.intent.category.BROWSABLE" />
+          <data android:scheme="tmproject" />
+        </intent-filter>
+>>>>>>> 423e92746de6dd702de111b871726560243b6176
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
