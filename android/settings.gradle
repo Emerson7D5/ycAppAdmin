@@ -1,7 +1,0 @@
-<<<<<<< HEAD
-rootProject.name = 'YoComproAdmin'
-=======
-rootProject.name = 'TMProject'
->>>>>>> 423e92746de6dd702de111b871726560243b6176
-apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
-include ':app'
