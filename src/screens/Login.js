@@ -138,7 +138,7 @@ export default class Login extends Component {
     }
 
     render() {
-        console.log(this.props.dataLogin);
+        console.log(this.props);
         return (
             <ImageBackground source={require('../img/Login.jpg')} style={styles.image}>
                 <View style={styles.mainBody}>
