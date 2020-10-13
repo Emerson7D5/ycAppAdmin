@@ -13,12 +13,17 @@ import {
 } from 'native-base';
 
 // Importing documents for tabs. 
-import TabNewOrders from './Tabs/TabNewOrders';
+import TabNewOrders from '@Tabs/TabNewOrders';
+import TabOpenOrders from '@Tabs/TabOpenOrders';
+import TabProcessOrders from '@Tabs/TabProcessOrders';
+import TabRecordOrders from '@Tabs/TabRecordOrders';
 
 
 import { webApi } from '../../constants/Utils';
 //import { EventRegister } from 'react-native-event-listeners';
 import AsyncStorage from '@react-native-community/async-storage';
+
+import { Bar } from 'react-native-progress';
 
 
 export default class Ordenes extends React.Component {
@@ -26,10 +31,9 @@ export default class Ordenes extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: true,
-            dataOrder: [],
-            dataOrderNew: [],
-            isRefreshing: false, // poner como true...............................
+            recordDataOrder: [],
+            openDataOrder: [],
+            isRefreshing: true,
             didUpdate: false,
             is_updated: false,
             initialPageTab: 3,
@@ -38,86 +42,135 @@ export default class Ordenes extends React.Component {
         }
     }
 
+    async componentDidMount() {
+        await AsyncStorage.getItem('user_restaurant').then((value) => {
+            if (value != null) {
+                this.setState({
+                    user_store: value,
+                });
+
+            }
+        });
+
+        await this.getOpenDataOrders();
+        await this.getRecordDataOrders();
+
+    }
+
+    onRefresh = (event) => {
+
+        this.setState({
+            isRefreshing: true
+        });
+
+        this.refreshData();
+    }
+
+    async refreshData() {
+
+        await this.getOpenDataOrders();
+        await this.getRecordDataOrders();
+
+        this.setState({
+            isRefreshing: false
+        });
+    }
+
+    getOpenDataOrders = () => {
+        return fetch(webApi + '/order_header/open_orders/' + this.state.user_store)
+            .then((response) => response.json())
+            .then((responseJson) => {
+
+                this.setState({
+                    openDataOrder: responseJson[0],
+                });
+
+
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
+    getRecordDataOrders = () => {
+        return fetch(webApi + '/order_header/record_orders/' + this.state.user_store)
+            .then((response) => response.json())
+            .then((responseJson) => {
+
+                this.setState({
+                    recordDataOrder: responseJson[0],
+                    isRefreshing: false,
+                });
+
+
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
     render() {
         const { navigate } = this.props.navigation;
 
-        // Ordenamos los array...
-        // this.state.dataOrder.sort(function (a, b) {
-        //     return a.order_creation_date > b.order_creation_date;
-        // });
-
-        // this.state.dataOrderNew.sort(function (a, b) {
-        //     return a.order_creation_date > b.order_creation_date;
-        // });
-
-        if (!this.state.isLoading) {
-            return (
-                <View style={styles.container}>
-                    <Spinner color='green' />
-                    <Text style={{ color: 'white' }}>Cargando Ordenes...</Text>
-                </View>
-            )
-        }
-
-        else {
 
 
-            return (
-                <SafeAreaView style={styles.container}>
-                    <ScrollView
-                        contentContainerStyle={styles.scrollView}
-                        refreshControl={
-                            <RefreshControl refreshing={this.state.isRefreshing}
-                                onRefresh={this.onRefresh} />
-                        }
-                    >
 
-                        <Content style={{ backgroundColor: '#021136' }}>
-                            <Tabs style={{ backgroundColor: '#021136' }}
-                                tabBarInactiveTextColor={'#fff'}
-                                initialPage={this.state.initialPageTab}
-                                page={this.state.initialPageTab}
-                                onChangeTab={this.changingTab}>
+        return (
+            <SafeAreaView style={styles.container}>
+                <ScrollView
+                    contentContainerStyle={styles.scrollView}
+                    refreshControl={
+                        <RefreshControl refreshing={this.state.isRefreshing}
+                            onRefresh={this.onRefresh} />
+                    }
+                >
 
-                                <Tab heading="Abiertas"
-                                    tabStyle={{ backgroundColor: "#021136" }}
-                                    activeTabStyle={{ backgroundColor: "#021136" }}>
-                                    
-                                    <TabNewOrders {...this.props} />
-                                    {/* <OrdenesAbiertas dataOrder={this.state.dataOrderNew}  {...this.props} /> */}
-                                </Tab>
+                    <Content style={{ backgroundColor: '#021136', marginTop: 50 }}>
+                        <Tabs style={{ backgroundColor: '#021136' }}
+                            tabBarInactiveTextColor={'#fff'}
+                            initialPage={this.state.initialPageTab}
+                            page={this.state.initialPageTab}
+                            onChangeTab={this.changingTab}>
 
-                                <Tab heading="Nuevas"
-                                    tabStyle={{ backgroundColor: "#021136", }}
-                                    activeTabStyle={{ backgroundColor: "#021136" }}>
+                            <Tab heading="Abiertas"
+                                tabStyle={{ backgroundColor: "#021136" }}
+                                activeTabStyle={{ backgroundColor: "#021136" }}>
 
-                                    {/* <OrdenesNuevas dataOrder={this.state.dataOrderNew} {...this.props} /> */}
-                                </Tab>
+                                <TabOpenOrders dataOrder={this.state.openDataOrder} {...this.props} />
 
-                                <Tab heading="En Proceso"
-                                    tabStyle={{ backgroundColor: "#021136" }}
-                                    activeTabStyle={{ backgroundColor: "#021136" }}>
+                            </Tab>
 
-                                    {/* <OrdenesEnProceso dataOrder={this.state.dataOrderNew} {...this.props} /> */}
-                                </Tab>
+                            <Tab heading="Nuevas"
+                                tabStyle={{ backgroundColor: "#021136", }}
+                                activeTabStyle={{ backgroundColor: "#021136" }}>
+                                <TabNewOrders dataOrder={this.state.openDataOrder} {...this.props} />
 
-                                <Tab heading="Historial"
-                                    tabStyle={{ backgroundColor: "#021136" }}
-                                    activeTabStyle={{ backgroundColor: "#021136" }}>
+                            </Tab>
 
-                                    {/* <OrdenesHistorial dataOrder={this.state.dataOrder} {...this.props} /> */}
-                                </Tab>
-                            </Tabs>
+                            <Tab heading="En Proceso"
+                                tabStyle={{ backgroundColor: "#021136" }}
+                                activeTabStyle={{ backgroundColor: "#021136" }}>
 
-                        </Content>
+                                <TabProcessOrders dataOrder={this.state.openDataOrder} {...this.props} />
+                            </Tab>
+
+                            <Tab heading="Historial"
+                                tabStyle={{ backgroundColor: "#021136" }}
+                                activeTabStyle={{ backgroundColor: "#021136" }}>
+
+                                <TabRecordOrders dataOrder={this.state.recordDataOrder} {...this.props} />
+                            </Tab>
+                        </Tabs>
+
+                    </Content>
 
 
-                    </ScrollView>
-                </SafeAreaView>
+                </ScrollView>
+            </SafeAreaView>
 
-            )
+        )
 
-        }
+
     }
 }
 

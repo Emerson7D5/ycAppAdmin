@@ -4,6 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 
 import Ordenes from '@Ordenes/Ordenes';
+import NuevaOrden from '@Details/NewOrder';
 import Cuenta from '@Cuenta/Cuenta';
 import DrawerContent from './DrawerContent';
 
@@ -57,6 +58,7 @@ const OrdenesStackScreen = ({navigation}) => (
         headerStyle: {
           backgroundColor: '#021136',
         },
+        headerTransparent: true,
         headerTintColor: '#fff',
         headerTitleStyle: {
           fontWeight: 'bold',
@@ -91,7 +93,7 @@ const OrdenesStackScreen = ({navigation}) => (
         }}
       />
   
-      {/* <OrdenesStack.Screen
+      <OrdenesStack.Screen
         name="NuevaOrden"
         component={NuevaOrden}
         options={{
@@ -100,7 +102,7 @@ const OrdenesStackScreen = ({navigation}) => (
             <Icon.Button
               name="bars"
               size={25}
-              backgroundColor="#0D1D41"
+              backgroundColor="transparent"
               color="#fff"
               onPress={() => {
                 navigation.openDrawer();
@@ -109,7 +111,7 @@ const OrdenesStackScreen = ({navigation}) => (
         }}
       />
   
-      <OrdenesStack.Screen
+      {/*<OrdenesStack.Screen
         name="EnProcesoOrden"
         component={EnProcesoOrden}
         options={{
