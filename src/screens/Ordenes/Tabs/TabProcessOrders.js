@@ -30,10 +30,12 @@ export default class TabProcessOrders extends Component {
 
             let fecha = DateFormat(dataContent.order_creation_date, "h:MMTT dd-mm-yyyy");
 
-            if (dataContent.order_current_status === 'Order Accepted') {
+            if (dataContent.order_current_status === 'Order Accepted' || dataContent.order_current_status === 'Delivery Assigned') {
                 
                 let screen = 'EnProcesoOrden';
                 let colorTiempo = '#FF9538';
+                
+                if (dataContent.order_current_status === 'Delivery Assigned') colorTiempo = 'purple';
 
                 return (
                     <List key={dataContent._id}
@@ -55,7 +57,7 @@ export default class TabProcessOrders extends Component {
                                         <Text style={{ textAlign: "center", marginBottom: 10, fontWeight: 'bold' }}>{dataContent.order_current_status}</Text>
 
                                         <Text note style={{ backgroundColor: colorTiempo, borderRadius: 10, color: '#FFF', textAlign: "center" }}>
-                                            <TimeAgo time={dataContent.order_creation_date} />
+                                            <TimeAgo time={dataContent.order_acceptation_date} />
                                         </Text>
 
                                     </Col>

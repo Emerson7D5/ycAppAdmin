@@ -79,17 +79,7 @@ const OrdenesStackScreen = ({navigation}) => (
                 navigation.openDrawer();
               }}></Icon.Button>
           ),
-          headerRight: () => (
-            <Icon.Button
-              name="refresh"
-              size={25}
-              backgroundColor={null}
-              color="#fff"
-              onPress={() => {
-                EventRegister.emit('reloadData', true),
-                  EventRegister.emit('changeTab', 3);
-              }}></Icon.Button>
-          ),
+          
         }}
       />
   

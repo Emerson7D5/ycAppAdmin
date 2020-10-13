@@ -24,8 +24,6 @@ export default class TabNewOrders extends React.Component {
 
         let content = this.props.dataOrder.map(function (dataContent, index) {
             let fecha = DateFormat(dataContent.order_creation_date, "h:MMTT dd-mm-yyyy");
-
-            console.log(dataContent);
             
             if (dataContent.order_current_status === 'Order Placed' ) {
                
