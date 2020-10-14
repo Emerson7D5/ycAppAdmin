@@ -33,7 +33,7 @@ import {Bar} from 'react-native-progress';
 const {width, height} = Dimensions.get('screen');
 const win = Dimensions.get('window');
 
-export default class NewOrder extends Component {
+export default class AcceptedOrder extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -63,7 +63,6 @@ export default class NewOrder extends Component {
 
   async getData() {
     const {dataContent} = await this.props.route.params;
-    console.log(this.props);
     
     await this.setState({idOrder: dataContent._id});
 
@@ -76,6 +75,10 @@ export default class NewOrder extends Component {
           dataOrder: responseJson,
           isFetching: false,
         });
+
+        console.log('');
+    console.log('la data... ', responseJson);
+    console.log('');
 
         this.setState({
           deliveryData: this.state.dataOrder.delivery_data,
@@ -146,59 +149,6 @@ export default class NewOrder extends Component {
   }
 
 
-  async cancelOrder() {
-    Alert.alert(
-      'Alerta',
-      '¿Desea cancelar el pedido?',
-      [
-        {
-          text: 'Cancelar',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {text: 'Aceptar', onPress: () => this.cancelingOrder()},
-      ],
-      {cancelable: false},
-    );
-  }
-
-  async cancelingOrder() {
-    let collection = {};
-
-    collection.id_order = this.state.idOrder;
-
-    const url = webApi + '/order_header/change_to_canceled';
-
-    this.setState({
-      isRejecting: true,
-    });
-
-    fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(collection),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .catch((error) => {
-        this.setState({
-          isRejecting: false,
-        });
-        Alert.alert(
-          'Hubo un error... Verifica tu conexión a internet. Y si no, contacta al administrador.',
-        );
-      })
-      .then((response) => {
-        this.setState({
-          isRejecting: false,
-        });
-
-        this.props.navigation.goBack();
-        // EventRegister.emit('changeTab', 0);
-        EventRegister.emit('reloadTabsData');
-      });
-  }
-
   deliveryPicker(value) {
     if (Object.keys(value).length != 0) {
       return value.map((item, index) => {
@@ -240,10 +190,17 @@ export default class NewOrder extends Component {
         </View>
       );
     } else {
-      let fecha = DateFormat(
+      let creationDate = DateFormat(
         this.state.dataOrder.order_creation_date,
         'h:MMTT dd-mm-yyyy',
       );
+
+      let acceptationDate = DateFormat(
+        this.state.dataOrder.order_acceptation_date,
+        'h:MMTT dd-mm-yyyy',
+      );
+
+
       require('moment/locale/es');
       moment.locale('es');
 
@@ -281,9 +238,23 @@ export default class NewOrder extends Component {
                   textAlign: 'center',
                   fontSize: 18,
                   fontWeight: 'bold',
-                  color: 'orange',
+                  color: 'lightblue',
                 }}>
                 {this.state.dataOrder.address_name}
+              </Text>
+
+              <Text
+                style={{
+                  marginTop: 10,
+                  textAlign: 'center',
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  color: 'orange',
+                }}>
+                <Icon
+                  name="pencil"
+                  style={{fontSize: 18, marginLeft: 10, color: 'orange'}}></Icon>
+                &nbsp; Creación: {creationDate}
               </Text>
 
               <Text
@@ -295,10 +266,12 @@ export default class NewOrder extends Component {
                   color: 'lightgreen',
                 }}>
                 <Icon
-                  name="pencil"
-                  style={{fontSize: 18, marginLeft: 10, color: '#fff'}}></Icon>
-                &nbsp; Creación: {fecha}
+                  name="check"
+                  style={{fontSize: 18, marginLeft: 10, color: 'lightgreen'}}></Icon>
+                &nbsp; Aceptada: {acceptationDate}
               </Text>
+
+              
 
               <Block middle row>
                 <Text
@@ -323,7 +296,7 @@ export default class NewOrder extends Component {
                   }}>
                   <TimeAgo
                     style={{color: '#fff', marginLeft: 50}}
-                    time={this.state.dataOrder.order_creation_date}
+                    time={this.state.dataOrder.order_acceptation_date}
                   />
                 </Text>
               </Block>
@@ -391,48 +364,26 @@ export default class NewOrder extends Component {
                   rounded
                   success
                   style={{
-                    width: 170,
+                    width: 220,
                     textAlign: 'center',
                     alignItems: 'center',
-                    marginRight: 20,
+                    marginRight: 20
                   }}
                   onPress={() => {
                     this.submit();
                   }}>
                   <Icon
-                    name="check"
+                    name="motorcycle"
                     style={{
                       fontSize: 15,
-                      marginLeft: 10,
+                      marginLeft: 15,
                       color: '#fff',
                     }}></Icon>
                   <Text style={{textAlign: 'center', fontWeight: 'bold'}}>
-                    Aceptar Pedido
+                    Asignar Repartidor
                   </Text>
                 </Button>
 
-                <Button
-                  rounded
-                  danger
-                  style={{
-                    width: 180,
-                    textAlign: 'center',
-                    alignItems: 'center',
-                  }}
-                  onPress={() => {
-                    this.cancelOrder();
-                  }}>
-                  <Icon
-                    name="trash"
-                    style={{
-                      fontSize: 15,
-                      marginLeft: 10,
-                      color: '#fff',
-                    }}></Icon>
-                  <Text style={{textAlign: 'center', fontWeight: 'bold'}}>
-                    Cancelar Pedido
-                  </Text>
-                </Button>
               </Block>
 
               <ItemsDetailNewOrder

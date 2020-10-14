@@ -5,13 +5,24 @@ import {
   ScrollView,
   RefreshControl,
   SafeAreaView,
+  Dimensions,
 } from 'react-native';
 
-import {Content, Text, Tab, Tabs, Spinner, Button} from 'native-base';
+import {
+  Content,
+  Text,
+  Tab,
+  Tabs,
+  Spinner,
+  Button,
+  TabHeading,
+  Right,
+  Body,
+  Left,
+} from 'native-base';
 
 // Importing documents for tabs.
 import TabNewOrders from '@Tabs/TabNewOrders';
-import TabOpenOrders from '@Tabs/TabOpenOrders';
 import TabProcessOrders from '@Tabs/TabProcessOrders';
 import TabRecordOrders from '@Tabs/TabRecordOrders';
 
@@ -21,6 +32,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import {Bar} from 'react-native-progress';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {Grid, Col} from 'react-native-easy-grid';
+
+const {width, height} = Dimensions.get('screen');
+const win = Dimensions.get('window');
 
 export default class Ordenes extends React.Component {
   constructor(props) {
@@ -56,7 +71,7 @@ export default class Ordenes extends React.Component {
         this.setState({
           isRefreshing: true,
         });
-    
+
         this.refreshData();
       }
     });
@@ -86,6 +101,7 @@ export default class Ordenes extends React.Component {
         this.setState({
           openDataOrder: responseJson[0],
         });
+
       })
       .catch((error) => {
         console.error(error);
@@ -121,39 +137,20 @@ export default class Ordenes extends React.Component {
               onRefresh={this.onRefresh}
             />
           }>
-          <Content style={{backgroundColor: '#021136', marginTop: 40}}>
-            <View
-              style={{
-                flex: 1,
-                width: window.width,
-                marginTop: 10,
-              }}>
-              {/* <Button
-                rounded transparent
-                onPress={() => {
-                  this.refreshData();
-                }}
-                style={{justifyContent: 'flex-end'}}
-                >
-                <Icon
-                  name="refresh"
-                  size={25}
-                  backgroundColor={'transparent'}
-                  color="#fff"
-                  style={{ alignItems: 'flex-end'}}
-                  ></Icon>
-              </Button> */}
-            </View>
-
+          <Content style={{backgroundColor: '#021136'}}>
+            
             <Tabs
               style={{backgroundColor: '#021136'}}
               tabBarInactiveTextColor={'#fff'}
               initialPage={this.state.initialPageTab}
               onChangeTab={this.changingTab}>
               <Tab
-                heading="Nuevas"
-                tabStyle={{backgroundColor: '#021136'}}
-                activeTabStyle={{backgroundColor: '#021136'}}>
+                heading={
+                  <TabHeading style={{backgroundColor: '#021136'}}>
+                    <Icon name="bell" color={'white'} />
+                    <Text>Nuevas</Text>
+                  </TabHeading>
+                }>
                 <TabNewOrders
                   dataOrder={this.state.openDataOrder}
                   {...this.props}
@@ -161,9 +158,12 @@ export default class Ordenes extends React.Component {
               </Tab>
 
               <Tab
-                heading="En Proceso"
-                tabStyle={{backgroundColor: '#021136'}}
-                activeTabStyle={{backgroundColor: '#021136'}}>
+                heading={
+                  <TabHeading style={{backgroundColor: '#021136'}}>
+                    <Icon name="tasks" color={'white'} />
+                    <Text>En Proceso</Text>
+                  </TabHeading>
+                }>
                 <TabProcessOrders
                   dataOrder={this.state.openDataOrder}
                   {...this.props}
@@ -171,9 +171,12 @@ export default class Ordenes extends React.Component {
               </Tab>
 
               <Tab
-                heading="Historial"
-                tabStyle={{backgroundColor: '#021136'}}
-                activeTabStyle={{backgroundColor: '#021136'}}>
+                heading={
+                  <TabHeading style={{backgroundColor: '#021136'}}>
+                    <Icon name="book" color={'white'} />
+                    <Text>Historial</Text>
+                  </TabHeading>
+                }>
                 <TabRecordOrders
                   dataOrder={this.state.recordDataOrder}
                   {...this.props}

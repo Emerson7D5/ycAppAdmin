@@ -123,7 +123,6 @@ export default class Cuenta extends React.Component {
                     isLoading: false,
                     dataStore: responseJson,
                 });
-                console.log(this.state.dataStore[0]);
             })
             .catch((error) => {
                 console.error(error);

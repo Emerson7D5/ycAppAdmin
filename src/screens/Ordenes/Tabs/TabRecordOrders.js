@@ -23,14 +23,6 @@ export default class OrdenesHistorial extends Component {
       let colorTiempo = '';
       let tiempoTranscurrido;
 
-      if (dataContent.order_current_status === 'Delivery Assigned') {
-        colorTiempo = '#920B0B';
-        tiempoTranscurrido = dataContent.order_delivery_assigned_date;
-        fecha = DateFormat(
-            dataContent.order_delivery_assigned_date,
-            'h:MMTT dd-mm-yyyy',
-          );
-      }
       if (dataContent.order_current_status === 'Picked Up') {
         colorTiempo = '#0976B2';
         tiempoTranscurrido = dataContent.picked_up_date;
@@ -58,7 +50,7 @@ export default class OrdenesHistorial extends Component {
                 <Col style={{height: 50}}>
                   <Text style={{marginBottom: 10, fontWeight: 'bold'}}>
                     {' '}
-                    {dataContent.user_fullname}{' '}
+                    {dataContent.unique_order_id.slice(15)}{' '}
                   </Text>
                   <Text note>{fecha}</Text>
                 </Col>
