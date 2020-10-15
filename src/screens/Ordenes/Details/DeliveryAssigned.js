@@ -33,7 +33,7 @@ import {Bar} from 'react-native-progress';
 const {width, height} = Dimensions.get('screen');
 const win = Dimensions.get('window');
 
-export default class AcceptedOrder extends Component {
+export default class DeliveryAssigned extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -41,6 +41,7 @@ export default class AcceptedOrder extends Component {
       show: false,
       showAccept: false,
       isLoading: false,
+      isRejecting: false,
       isFetching: true,
       dataOrder: [],
       user_id: null,
@@ -62,7 +63,7 @@ export default class AcceptedOrder extends Component {
 
   async getData() {
     const {dataContent} = await this.props.route.params;
-
+    
     await this.setState({idOrder: dataContent._id});
 
     return fetch(
@@ -85,35 +86,19 @@ export default class AcceptedOrder extends Component {
   }
 
   async submit() {
-    if(this.state.selectedDelivery === '0'){
-      Alert.alert(
-        'Alerta',
-        'No has asignado ningún repartidor.',
-        [
-          {
-            text: 'Aceptar',
-            style: 'cancel',
-          },
-        ],
-        {cancelable: false},
-      );
-    }
-    else {
-      Alert.alert(
-        'Alerta',
-        '¿Desea asignar repartidor?',
-        [
-          {
-            text: 'Cancelar',
-            onPress: () => console.log('Cancel Pressed'),
-            style: 'cancel',
-          },
-          {text: 'Aceptar', onPress: () => this.acceptingOrder()},
-        ],
-        {cancelable: false},
-      );
-    }
-    
+    Alert.alert(
+      'Alerta',
+      '¿Desea aceptar el pedido?',
+      [
+        {
+          text: 'Cancelar',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'Aceptar', onPress: () => this.acceptingOrder()},
+      ],
+      {cancelable: false},
+    );
   }
 
   acceptingOrder() {
@@ -121,9 +106,13 @@ export default class AcceptedOrder extends Component {
     let url = '';
 
     collection.id_order = this.state.idOrder;
-    collection.id_delivery = this.state.selectedDelivery;
 
-    url = webApi + '/order_header/change_from_accepted_to_delivery_assigned';
+    if (this.state.selectedDelivery != 0) {
+      collection.id_delivery = this.state.selectedDelivery;
+      url = webApi + '/order_header/change_to_delivery_assigned';
+    } else {
+      url = webApi + '/order_header/change_to_accepted';
+    }
 
     this.setState({
       isLoading: true,
@@ -155,6 +144,7 @@ export default class AcceptedOrder extends Component {
       });
   }
 
+
   deliveryPicker(value) {
     if (Object.keys(value).length != 0) {
       return value.map((item, index) => {
@@ -184,12 +174,18 @@ export default class AcceptedOrder extends Component {
     } else if (this.state.isLoading) {
       return (
         <View style={styles.container}>
-          <Spinner color="darkorange" />
-          <Text>Asignando Repartidor...</Text>
+          <Spinner color="green" />
+          <Text>Aceptando Pedido...</Text>
         </View>
       );
-    } 
-    else {
+    } else if (this.state.isRejecting) {
+      return (
+        <View style={styles.container}>
+          <Spinner color="red" />
+          <Text>Cancelando Pedido...</Text>
+        </View>
+      );
+    } else {
       let creationDate = DateFormat(
         this.state.dataOrder.order_creation_date,
         'h:MMTT dd-mm-yyyy',
@@ -199,6 +195,7 @@ export default class AcceptedOrder extends Component {
         this.state.dataOrder.order_acceptation_date,
         'h:MMTT dd-mm-yyyy',
       );
+
 
       require('moment/locale/es');
       moment.locale('es');
@@ -250,11 +247,7 @@ export default class AcceptedOrder extends Component {
                 }}>
                 <Icon
                   name="pencil"
-                  style={{
-                    fontSize: 18,
-                    marginLeft: 10,
-                    color: 'orange',
-                  }}></Icon>
+                  style={{fontSize: 18, marginLeft: 10, color: 'orange'}}></Icon>
                 &nbsp; Creación: {creationDate}
               </Text>
 
@@ -268,13 +261,11 @@ export default class AcceptedOrder extends Component {
                 }}>
                 <Icon
                   name="check"
-                  style={{
-                    fontSize: 18,
-                    marginLeft: 10,
-                    color: 'lightgreen',
-                  }}></Icon>
+                  style={{fontSize: 18, marginLeft: 10, color: 'lightgreen'}}></Icon>
                 &nbsp; Aceptada: {acceptationDate}
               </Text>
+
+              
 
               <Block middle row>
                 <Text
@@ -312,82 +303,15 @@ export default class AcceptedOrder extends Component {
                     fontSize: 18,
                     fontWeight: 'bold',
                     color: 'white',
-                    marginBottom: 15,
+                    marginBottom: 35,
                   }}>
-                  Repartidor: &nbsp;
+                  Repartidor: {this.state.dataOrder.delivery_guy}
                 </Text>
               </Block>
 
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    width: win.width - 100,
-                    backgroundColor: 'white',
-                    height: 50,
-                    borderRadius: 20,
-                  }}>
-                  <Picker
-                    note
-                    mode="dropdown"
-                    iosHeader="Select your SIM"
-                    iosIcon={<Icon name="arrow-down" />}
-                    style={{
-                      width: win.width - 100,
-                      borderRadius: 50,
-                      marginBottom: 20,
-                      textAlign: 'center',
-                      alignItems: 'center',
-                    }}
-                    color={'#000'}
-                    selectedValue={this.state.selectedDelivery}
-                    onValueChange={this.onValueChange.bind(this)}>
-                    <Picker.Item label="Sin Asignar" value="0" key="0" />
-                    {this.deliveryPicker(this.state.deliveryData)}
-                  </Picker>
-                </View>
-              </View>
+              
 
-              <Block
-                row
-                middle
-                space="evenly"
-                style={{
-                  flex: 1,
-                  paddingBottom: 24,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: 20,
-                }}>
-                <Button
-                  rounded
-                  success
-                  style={{
-                    width: 220,
-                    textAlign: 'center',
-                    alignItems: 'center',
-                    marginRight: 20,
-                  }}
-                  onPress={() => {
-                    this.submit();
-                  }}>
-                  <Icon
-                    name="motorcycle"
-                    style={{
-                      fontSize: 15,
-                      marginLeft: 15,
-                      color: '#fff',
-                    }}></Icon>
-                  <Text style={{textAlign: 'center', fontWeight: 'bold'}}>
-                    Asignar Repartidor
-                  </Text>
-                </Button>
-              </Block>
-
+              
               <ItemsDetailNewOrder
                 dataOrder={this.state.dataOrder.items_detail}
                 {...this.props}
@@ -395,7 +319,7 @@ export default class AcceptedOrder extends Component {
             </View>
           </Content>
 
-          <Footer style={styles.footer}>
+          <Footer transparent style={styles.footer}>
             <Button
               warning
               rounded

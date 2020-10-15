@@ -249,10 +249,8 @@ export default class NewOrder extends Component {
 
       return (
         <Container>
-          <Content>
-            <ImageBackground
-              source={require('../../../img/Azul.jpg')}
-              style={styles.image}>
+          <Content >
+            <View style={{backgroundColor: '#021136'}}>
               <Text
                 style={{
                   marginTop: 10,
@@ -434,12 +432,11 @@ export default class NewOrder extends Component {
                   </Text>
                 </Button>
               </Block>
-
+              </View>
               <ItemsDetailNewOrder
                 dataOrder={this.state.dataOrder.items_detail}
                 {...this.props}
               />
-            </ImageBackground>
           </Content>
 
           <Footer transparent style={styles.footer}>

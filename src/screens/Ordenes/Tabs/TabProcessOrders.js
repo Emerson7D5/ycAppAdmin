@@ -18,6 +18,7 @@ import TimeAgo from 'react-native-timeago';
 import DateFormat from 'dateformat';
 import moment from 'moment';
 import * as Progress from 'react-native-progress';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const {width, height} = Dimensions.get('screen');
 const win = Dimensions.get('window');
@@ -41,6 +42,8 @@ export default class TabProcessOrders extends Component {
       let deliveryTime = dataContent.delivery_time;
       let progressBar = 0;
       let colorProgressBar = 'red';
+      let deliveryColor = 'darkgreen';
+      let deliveryLetterColor = 'white';
 
       let acceptationDate = new Date(dataContent.order_acceptation_date);
       let now = new Date();
@@ -56,32 +59,13 @@ export default class TabProcessOrders extends Component {
       } else {
         progressBar = (availableTime * 1.0) / deliveryTime;
         progressBar = 1 - progressBar;
-        console.log('este es el... ', progressBar);
         colorProgressBar = 'green';
       }
 
-      //   if (availableTime > 0) {
-      //     let availableMilis = availableTime * 60000;
+      if (availableTime <= Math.round(deliveryTime / 2) && availableTime != 0)
+        colorProgressBar = 'orange';
 
-      //     test(10);
-      //   }
-
-      // testing...
-
-      //   let calc = dateTesting.getTime();
-
-      //   let newCalculo = Math.round(testing / (1000 * 60 * 60 * 24));
-
-      //   console.log('Calculo ', calc, ' ahorita ', now, ' creada ', dateTesting, ' resta', testing);
-      //   console.log('new calculo... ', newCalculo);
-      console.log(
-        'ahora siiiiiiiiiiiii.... ',
-        timeAgo,
-        ' ',
-        deliveryTime,
-        ' and... ',
-        availableTime,
-      );
+      let deliveryGuy = 'Sin Asignar';
 
       if (
         dataContent.order_current_status === 'Order Accepted' ||
@@ -95,13 +79,16 @@ export default class TabProcessOrders extends Component {
           colorTime = 'purple';
           screen = 'DeliveryAssigned';
           date = dataContent.delivery_assigned_date;
+          deliveryGuy = dataContent.delivery_guy;
+          deliveryColor = null;
+          deliveryLetterColor = 'black';
         }
 
         return (
           <TouchableOpacity
             key={dataContent._id}
             onPress={() => navigate(screen, {dataContent})}>
-            <Card style={{marginLeft: 5, marginRight: 5}}>
+            <Card style={{marginLeft: 5, marginRight: 5,}}>
               <CardItem header bordered style={{backgroundColor: colorTime}}>
                 <Body>
                   <View style={{justifyContent: 'center', minHeight: 30}}>
@@ -180,69 +167,54 @@ export default class TabProcessOrders extends Component {
                         marginBottom: 15,
                         marginTop: 10,
                       }}>
-                      Tiempo Disponible: {availableTime} min
+                      Tiempo disponible aproximado: {availableTime} min
                     </Text>
 
-                    <Grid>
-                      <Left></Left>
-                      <Body>
+                    <Grid style={{marginTop: 10}}>
+                      <Left>
+                        <Text style={{fontSize: 15, fontWeight: 'bold', width: 130, textAlign: 'center'}}>
+                          Delivery:{' '}
+                        </Text>
+                        <Text
+                          style={{
+                            marginTop: 5,
+                            textAlign: 'center',
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                            borderRadius: 20,
+                            backgroundColor: deliveryColor,
+                            width: 130,
+                            color: deliveryLetterColor
+                          }}>
+                          {deliveryGuy}
+                        </Text>
+                      </Left>
+                      <Body></Body>
+                      <Right>
                         <Button
                           warning
                           rounded
-                          style={{alignItems: 'center', width: 140, alignItems: 'center'}}
+                          style={{
+                            alignItems: 'center',
+                            width: 140,
+                            alignItems: 'center',
+                            marginRight: 10,
+                          }}
                           onPress={() => navigate(screen, {dataContent})}>
-                          <Text style={{fontWeight: 'bold'}}>Ver detalle...</Text>
+                          <Text style={{fontWeight: 'bold'}}>Ver Detalle</Text>
+                          <Icon
+                            name="arrow-right"
+                            color={'white'}
+                            style={{marginRight: 5}}
+                          />
                         </Button>
-                      </Body>
-                      <Right></Right>
+                      </Right>
                     </Grid>
-
                   </View>
-
                 </Body>
               </CardItem>
             </Card>
           </TouchableOpacity>
-
-          //   <List key={dataContent._id} style={{backgroundColor: '#E6E6E6'}}>
-          //     <ListItem
-          //       keyExtractor={(dataContent) => dataContent._id}
-          //       onPress={() => navigate(screen, {dataContent})}>
-          //       <Body>
-          //         <Grid>
-          //           <Col style={{height: 50}}>
-          //             <Text style={{marginBottom: 10, fontWeight: 'bold'}}>
-          //               {' '}
-          //               {dataContent.unique_order_id.slice(15)}{' '}
-          //             </Text>
-          //             <Text note>{fecha}</Text>
-          //           </Col>
-
-          //           <Col style={{height: 50}}>
-          //             <Text
-          //               style={{
-          //                 textAlign: 'center',
-          //                 marginBottom: 10,
-          //                 fontWeight: 'bold',
-          //               }}>
-          //               {dataContent.order_current_status}
-          //             </Text>
-
-          //             <Text
-          //               note
-          //               style={{
-          //                 backgroundColor: colorTiempo,
-          //                 borderRadius: 10,
-          //                 color: '#FFF',
-          //                 textAlign: 'center',
-          //               }}>
-          //               <TimeAgo time={dataContent.order_acceptation_date} />
-          //             </Text>
-          //           </Col>
-          //         </Grid>
-          //       </Body>
-          //     </ListItem>
-          //   </List>
         );
       }
     });

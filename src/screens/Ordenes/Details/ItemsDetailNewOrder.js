@@ -5,7 +5,7 @@ import {
 
 } from 'native-base';
 import { Col, Grid } from 'react-native-easy-grid';
-//import DetalleAddons from './DetalleAddons';
+import AddonsDetail from './AddonsDetail';
 
 export default class ItemsDetailNewOrder extends Component {
 
@@ -24,24 +24,25 @@ export default class ItemsDetailNewOrder extends Component {
             let objeto = [];
             let contenido = [];
 
-            console.log('testing... ', dataContent);
 
-            // objeto = dataContent.detail_item[0].item_addons_selected;
+            objeto = dataContent.addons_data;
 
-            // objeto.forEach(element => {
-            //     suma++;
-            //     contenido[suma] = DetalleAddons(element);
-            // });
+            objeto.forEach(element => {
+                suma++;
+                contenido[suma] = AddonsDetail(element);
+            });
 
-            // let tituloAddons = '';
+            let tituloAddons = '';
 
-            // if (suma === 0) {
-            //     tituloAddons = 'No addons...';
-            // }
-            // else {
-            //     tituloAddons = 'Addons:';
-            // }
+            if (suma === 0) {
+                tituloAddons = 'Sin addons...';
+            }
+            else {
+                tituloAddons = 'Addons:';
+            }
 
+            let price = dataContent.item_price.toFixed(2);
+            
             return (
 
                 <List 
@@ -64,11 +65,18 @@ export default class ItemsDetailNewOrder extends Component {
                                     <Text style={{ fontWeight: "bold", fontSize: 20, }}>
                                         {dataContent.item_name}
                                     </Text>
-                                    {/* <Text style={{ fontSize: 15, marginTop: 10 }}> {dataContent.detail_observaciones} </Text> */}
-                                    {/* <Text style={{ marginTop: 15, fontWeight: "bold", color: 'darkred', fontSize: 17, marginBottom: 5 }}> {tituloAddons} </Text> */}
-                                    {/* <Text>{contenido}</Text> */}
+                                    <Text style={{ marginTop: 15, fontWeight: "bold", color: 'darkred', fontSize: 17, marginBottom: 5 }}> {tituloAddons} </Text>
+                                    
+                                </Col>
+
+                                <Col style={{ width: 80, alignItems: "center", marginTop: 10, marginBottom: 10 }}>
+                                    <Text style={{ textAlign: "right", fontWeight: "bold", fontSize: 20 }}>
+                                        ${price}
+                                    </Text>
                                 </Col>
                             </Grid>
+
+                            <Text>{contenido}</Text>
                         </Body>
 
 

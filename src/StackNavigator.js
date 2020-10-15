@@ -6,12 +6,14 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import Ordenes from '@Ordenes/Ordenes';
 import NewOrder from '@Details/NewOrder';
 import AcceptedOrder from '@Details/AcceptedOrder';
+import DeliveryAssigned from '@Details/DeliveryAssigned';
 import Cuenta from '@Cuenta/Cuenta';
 import DrawerContent from './DrawerContent';
 
 import { EventRegister } from 'react-native-event-listeners';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 const OrdenesStack = createStackNavigator();
 const CuentaStack = createStackNavigator();
@@ -130,6 +132,24 @@ const OrdenesStackScreen = ({ navigation }) => (
       }}
     />
 
+<OrdenesStack.Screen
+      name="DeliveryAssigned"
+      component={DeliveryAssigned}
+      options={{
+        title: 'Orden Aceptada y Asignada',
+        headerLeft: () => (
+          <Icon.Button
+            name="bars"
+            size={25}
+            backgroundColor="transparent"
+            color="#fff"
+            onPress={() => {
+              navigation.openDrawer();
+            }}></Icon.Button>
+        ),
+      }}
+    />
+
   </OrdenesStack.Navigator>
 );
 
@@ -142,7 +162,7 @@ const StackNavigator = (props) => {
       <Drawer.Navigator
         activeBackgroundColor={'#000'}
         drawerContent={(props) => <DrawerContent {...props} />}
-        initialRouteName={'Cuenta'}
+        initialRouteName={'Ordenes'}
         drawerContentOptions={{
           activeTintColor: '#000',
           activeBackgroundColor: '#000',
