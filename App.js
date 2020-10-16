@@ -33,6 +33,9 @@ import StackNavigator from '@src/StackNavigator';
 // For async storage...
 import AsyncStorage from '@react-native-community/async-storage';
 
+//EvenRegister for update from other screen...
+import {EventRegister} from 'react-native-event-listeners';
+
 
 export default class App extends React.Component {
   constructor(props) {
@@ -57,16 +60,37 @@ export default class App extends React.Component {
       2000,
       this,
     );
+
+    // loginCorrectly
+  EventRegister.addEventListener('loginCorrectly', (data) => {
+    this.setState({
+      stateLogin: false,
+      userValidation: true,
+    });
+  });
+
+  EventRegister.addEventListener('logOut', (data) => {
+    this.setState({
+      stateLogin: true,
+      userValidation: false,
+    });
+  });
   }
 
 
   // Mientras no funciona el login...
   async loginProcess() {
-    await AsyncStorage.setItem('user_id', '4');
-    await AsyncStorage.setItem('user_name', 'Administrador');
-    await AsyncStorage.setItem('user_restaurant', '1');
-    await AsyncStorage.setItem('user_img', 'image');
-    await AsyncStorage.setItem('user_email', 'admin_tiendas@yocomproencande.com');
+    await AsyncStorage.clear();
+
+    // await AsyncStorage.setItem('user_id', '4');
+    // await AsyncStorage.setItem('user_name', 'Administrador');
+    
+    //PENDIENTE
+    //await AsyncStorage.setItem('user_restaurant', '0');
+    
+    // await AsyncStorage.setItem('user_img', 'image');
+    // await AsyncStorage.setItem('user_email', 'admin_tiendas@yocomproencande.com');
+
 
     //EventRegister.emit('loginCorrectly', true);
 

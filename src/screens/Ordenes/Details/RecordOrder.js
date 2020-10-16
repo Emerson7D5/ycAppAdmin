@@ -1,13 +1,5 @@
 import React, {Component} from 'react';
-import {
-  StyleSheet,
-  View,
-  Modal,
-  Alert,
-  TextInput,
-  ImageBackground,
-  Dimensions,
-} from 'react-native';
+import {StyleSheet, View, Alert} from 'react-native';
 
 import {
   Container,
@@ -26,14 +18,10 @@ import moment from 'moment';
 import {webApi} from '../../../constants/Utils';
 import ItemsDetailNewOrder from './ItemsDetailNewOrder';
 import {EventRegister} from 'react-native-event-listeners';
-import AsyncStorage from '@react-native-community/async-storage';
 
 import {Bar} from 'react-native-progress';
 
-const {width, height} = Dimensions.get('screen');
-const win = Dimensions.get('window');
-
-export default class DeliveryAssigned extends Component {
+export default class RecordOrder extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -55,21 +43,21 @@ export default class DeliveryAssigned extends Component {
     this.getData();
   }
 
-
   async getData() {
     const {dataContent} = await this.props.route.params;
-    
+
     await this.setState({idOrder: dataContent._id});
 
-    return fetch(
-      webApi + '/order_header/detail_order/' + this.state.idOrder,
-    )
+    return fetch(webApi + '/order_header/detail_order/' + this.state.idOrder)
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
           dataOrder: responseJson,
           isFetching: false,
         });
+
+        console.log('the response json... ', responseJson);
+        console.log('');
 
         this.setState({
           deliveryData: this.state.dataOrder.delivery_data,
@@ -80,7 +68,36 @@ export default class DeliveryAssigned extends Component {
       });
   }
 
-  
+  lastDate(element) {
+    let date = DateFormat(this.state.dataOrder.last_date, 'h:MMTT dd-mm-yyyy');
+
+    let status = 'Completed';
+
+    if (element.current_status === 'Picked Up') {
+      status = 'Picked Up';
+    }
+
+    return (
+      <Text
+        style={{
+          marginTop: 10,
+          textAlign: 'center',
+          fontSize: 18,
+          fontWeight: 'bold',
+          color: '#9BDCF0',
+        }}>
+        <Icon
+          name="check"
+          style={{
+            fontSize: 18,
+            marginLeft: 10,
+            color: '#9BDCF0',
+          }}></Icon>
+        &nbsp; {status}: {date}
+      </Text>
+    );
+  }
+
   render() {
     const {navigate} = this.props.navigation;
 
@@ -91,8 +108,7 @@ export default class DeliveryAssigned extends Component {
           <Text style={{fontSize: 20, marginTop: 20}}>Cargando...</Text>
         </View>
       );
-    } 
-    else {
+    } else {
       let creationDate = DateFormat(
         this.state.dataOrder.order_creation_date,
         'h:MMTT dd-mm-yyyy',
@@ -103,11 +119,12 @@ export default class DeliveryAssigned extends Component {
         'h:MMTT dd-mm-yyyy',
       );
 
-      let deliveryDateAssigned = DateFormat(
-        this.state.dataOrder.delivery_assigned_date, 
+      let deliveryAssigned = DateFormat(
+        this.state.dataOrder.delivery_assigned_date,
         'h:MMTT dd-mm-yyyy',
       );
 
+      let total = this.state.dataOrder.total_order.toFixed(2);
 
       require('moment/locale/es');
       moment.locale('es');
@@ -159,7 +176,11 @@ export default class DeliveryAssigned extends Component {
                 }}>
                 <Icon
                   name="pencil"
-                  style={{fontSize: 18, marginLeft: 10, color: 'orange'}}></Icon>
+                  style={{
+                    fontSize: 18,
+                    marginLeft: 10,
+                    color: 'orange',
+                  }}></Icon>
                 &nbsp; Created: {creationDate}
               </Text>
 
@@ -173,7 +194,11 @@ export default class DeliveryAssigned extends Component {
                 }}>
                 <Icon
                   name="tasks"
-                  style={{fontSize: 18, marginLeft: 10, color: 'lightgreen'}}></Icon>
+                  style={{
+                    fontSize: 18,
+                    marginLeft: 10,
+                    color: 'lightgreen',
+                  }}></Icon>
                 &nbsp; Accepted: {acceptationDate}
               </Text>
 
@@ -187,9 +212,15 @@ export default class DeliveryAssigned extends Component {
                 }}>
                 <Icon
                   name="motorcycle"
-                  style={{fontSize: 18, marginLeft: 10, color: '#C2A5F2'}}></Icon>
-                &nbsp; Delivery Assigned: {deliveryDateAssigned}
+                  style={{
+                    fontSize: 18,
+                    marginLeft: 10,
+                    color: '#C2A5F2',
+                  }}></Icon>
+                &nbsp; Delivery Assigned: {deliveryAssigned}
               </Text>
+
+              {this.lastDate(this.state.dataOrder)}
 
               <Block middle row>
                 <Text
@@ -214,8 +245,49 @@ export default class DeliveryAssigned extends Component {
                   }}>
                   <TimeAgo
                     style={{color: '#fff', marginLeft: 50}}
-                    time={this.state.dataOrder.delivery_assigned_date}
+                    time={this.state.dataOrder.last_date}
                   />
+                </Text>
+              </Block>
+
+              <Block middle row>
+                <Text
+                  style={{
+                    marginTop: 20,
+                    textAlign: 'center',
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    borderRadius: 20,
+                    color: 'white',
+                  }}>
+                  Estado:{'    '}
+                </Text>
+                <Text
+                  style={{
+                    marginTop: 20,
+                    textAlign: 'center',
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    borderRadius: 20,
+                    backgroundColor: 'lightgray',
+                    width: 150,
+                  }}>
+                  {this.state.dataOrder.current_status}
+                </Text>
+              </Block>
+
+              <Block middle row>
+                <Text
+                  style={{
+                    marginTop: 20,
+                    textAlign: 'center',
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    borderRadius: 20,
+                    color: 'white',
+                    width: 150,
+                  }}>
+                  Total ${total}
                 </Text>
               </Block>
 
@@ -233,9 +305,6 @@ export default class DeliveryAssigned extends Component {
                 </Text>
               </Block>
 
-              
-
-              
               <ItemsDetailNewOrder
                 dataOrder={this.state.dataOrder.items_detail}
                 {...this.props}

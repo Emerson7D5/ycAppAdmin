@@ -170,18 +170,18 @@ export default class Ordenes extends React.Component {
       } else {
         progressBar = (availableTime * 1.0) / deliveryTime;
         progressBar = 1 - progressBar;
-        console.log('este es el progressBar... ', progressBar);
+        //console.log('este es el progressBar... ', progressBar);
         colorProgressBar = 'green';
       }
 
-      console.log(
-        'ahora siiiiiiiiiiiii.... ',
-        timeAgo,
-        ' ',
-        deliveryTime,
-        ' and... ',
-        availableTime,
-      );
+      // console.log(
+      //   'ahora siiiiiiiiiiiii.... ',
+      //   timeAgo,
+      //   ' ',
+      //   deliveryTime,
+      //   ' and... ',
+      //   availableTime,
+      // );
 
       if (
         dataContent.order_current_status === 'Order Accepted' ||

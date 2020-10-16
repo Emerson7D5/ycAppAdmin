@@ -94,46 +94,6 @@ export default class TabNewOrders extends React.Component {
             </Card>
           </TouchableOpacity>
 
-          // <List key={dataContent._id} style={{backgroundColor: '#E6E6E6'}}>
-          //   <ListItem
-          //     keyExtractor={(dataContent) => dataContent._id}
-          //     onPress={() => navigate(screen, {dataContent})}>
-          //     <Body>
-
-          //       <Grid>
-          //         <Col style={{height: 50}}>
-          //           <Text style={{marginBottom: 10, fontWeight: 'bold'}}>
-          //             {' '}
-          //             {dataContent.unique_order_id.slice(15)}{' '}
-          //           </Text>
-          //           <Text note>{fecha}</Text>
-          //         </Col>
-
-          //         <Col style={{height: 50}}>
-          //           <Text
-          //             style={{
-          //               textAlign: 'center',
-          //               marginBottom: 10,
-          //               fontWeight: 'bold',
-          //             }}>
-          //             {dataContent.order_current_status}
-          //           </Text>
-
-          //           <Text
-          //             note
-          //             style={{
-          //               backgroundColor: colorTiempo,
-          //               borderRadius: 10,
-          //               color: '#FFF',
-          //               textAlign: 'center',
-          //             }}>
-          //             <TimeAgo time={dataContent.order_creation_date} />
-          //           </Text>
-          //         </Col>
-          //       </Grid>
-          //     </Body>
-          //   </ListItem>
-          // </List>
         );
       }
     });

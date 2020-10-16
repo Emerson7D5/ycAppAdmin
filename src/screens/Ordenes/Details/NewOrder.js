@@ -259,7 +259,7 @@ export default class NewOrder extends Component {
                   fontWeight: 'bold',
                   color: '#CC5050',
                 }}>
-                {this.state.dataOrder.order_code.slice(15)}
+                #{this.state.dataOrder.order_code.slice(15)}
               </Text>
 
               <Text
