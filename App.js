@@ -20,9 +20,7 @@ import {
 
 import NetInfo from '@react-native-community/netinfo';
 
-import * as Animatable from 'react-native-animatable';
-
-import {Button} from 'native-base';
+import {webApi} from './src/constants/Utils';
 
 import Splash from '@screens/Splash';
 import Login from '@screens/Login';
@@ -36,17 +34,19 @@ import AsyncStorage from '@react-native-community/async-storage';
 //EvenRegister for update from other screen...
 import {EventRegister} from 'react-native-event-listeners';
 
+import messaging from '@react-native-firebase/messaging';
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      initialRoute: 'Cuenta',
+      initialRoute: 'Ordenes',
       userValidation: false,
       stateLogin: false,
       userStatus: false,
       infoLogin: [],
       connection_Status: null,
+      user_id: '',
     };
   }
 
@@ -62,42 +62,91 @@ export default class App extends React.Component {
     );
 
     // loginCorrectly
-  EventRegister.addEventListener('loginCorrectly', (data) => {
+    EventRegister.addEventListener('loginCorrectly', (data) => {
+      this.loginCorrectly();
+    });
+
+    EventRegister.addEventListener('logOut', (data) => {
+      this.setState({
+        stateLogin: true,
+        userValidation: true,
+      });
+    });
+  }
+
+  async loginCorrectly() {
+    await AsyncStorage.getItem('number_of_restaurants').then((value) => {
+      if (value != null) {
+        if (value > 1) this.setState({initialRoute: 'RestaurantsByUser'});
+      }
+    });
+
+    await messaging()
+      .getToken()
+      .then((token) => {
+        this.saveTokenToDatabase(token);
+      });
+
     this.setState({
       stateLogin: false,
       userValidation: true,
     });
-  });
-
-  EventRegister.addEventListener('logOut', (data) => {
-    this.setState({
-      stateLogin: true,
-      userValidation: false,
-    });
-  });
   }
 
+  async saveTokenToDatabase(token) {
+    await AsyncStorage.getItem('user_id').then((value) => {
+      if (value != null) {
+        this.setState({
+          user_id: value,
+        });
+      }
+    });
+
+    let collection = {};
+    collection.user_id = this.state.user_id;
+    collection.token = token;
+
+    const url = webApi + '/tokens/save_token';
+
+    await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(collection),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .catch((error) => console.error('Error:', error))
+      .then((response) => {});
+  }
 
   // Mientras no funciona el login...
   async loginProcess() {
-    await AsyncStorage.clear();
+    //await AsyncStorage.clear();
 
     // await AsyncStorage.setItem('user_id', '4');
     // await AsyncStorage.setItem('user_name', 'Administrador');
-    
+
+    await AsyncStorage.getItem('number_of_restaurants').then((value) => {
+      if (value != null) {
+        if (value > 1) {
+          this.setState({initialRoute: 'RestaurantsByUser'});
+        }
+      }
+    });
+
+    if (this.state.initialRoute === 'RestaurantsByUser'){
+      await AsyncStorage.setItem('user_restaurant', '0');
+    }
     //PENDIENTE
     //await AsyncStorage.setItem('user_restaurant', '0');
-    
+
     // await AsyncStorage.setItem('user_img', 'image');
     // await AsyncStorage.setItem('user_email', 'admin_tiendas@yocomproencande.com');
-
 
     //EventRegister.emit('loginCorrectly', true);
 
     NetInfo.addEventListener(this.handleConnectivityChange);
     await this.verifyingUserIdentity();
-
-    
   }
 
   handleConnectivityChange = async (state) => {
@@ -112,13 +161,13 @@ export default class App extends React.Component {
 
   async verifyingUserIdentity() {
     let result = false;
-  
+
     await AsyncStorage.getItem('user_id').then((value) => {
       if (value != null) {
         result = true;
       }
     });
-  
+
     if (result === false) {
       let inf = await FetchLoginInfo();
 
@@ -129,6 +178,12 @@ export default class App extends React.Component {
         userValidation: true,
       });
     } else {
+      await messaging()
+        .getToken()
+        .then((token) => {
+          this.saveTokenToDatabase(token);
+        });
+
       this.setState({
         stateLogin: false,
         userValidation: true,
@@ -136,53 +191,20 @@ export default class App extends React.Component {
     }
   }
 
-  
-
   render() {
     if (this.state.userValidation === false) {
       return <Splash />;
     } else if (this.state.connection_Status === false) {
       return <ConnectionError />;
     } else if (this.state.stateLogin === true) {
-      return (
-        <Login
-          dataLogin={this.state.infoLogin}
-          {...this.props}
-        />
-      );
+      return <Login dataLogin={this.state.infoLogin} {...this.props} />;
     } else {
       return (
-        <StackNavigator {...this.props}/>
+        <StackNavigator
+          {...this.props}
+          restaurants={{initialRoute: this.state.initialRoute}}
+        />
       );
     }
   }
 }
-
-// const App = (props) => {
-
-//   const [initialRoute, setInitialRoute] = React.useState('Cuenta');
-//   const [userValidation, setUserValidation] = React.useState(false);
-//   const [stateLogin, setStateLogin] = React.useState(false);
-
-//   let variable = verifyingUser();
-
-//   console.log('esta es la verifying... ', variable);
-
-//   if (variable === false) {setStateLogin(true); setUserValidation(true);}
-
-//   if (userValidation === false) {
-//     return ( <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><Text>Aqui va el splash</Text></View>);
-//   }
-//   else if (stateLogin === true){
-//     return (
-//       <Login {...props}/>
-//     );
-//   }
-//   else {
-
-//     return ( <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><Text>Aqui va el react navigation</Text></View>);
-
-//   }
-// };
-
-//export default App;

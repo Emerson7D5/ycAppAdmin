@@ -3,7 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
-import Restaurants from './screens/RestaurantsByUser';
 import Ordenes from '@Ordenes/Ordenes';
 import NewOrder from '@Details/NewOrder';
 import AcceptedOrder from '@Details/AcceptedOrder';
@@ -208,6 +207,13 @@ const OrdenesStackScreen = ({ navigation }) => (
 
 
 const StackNavigator = (props) => {
+
+  console.log('los props dentro del stacknavigator... ', props);
+  
+  let initialRoute = props.restaurants.initialRoute;
+
+
+
   return (
     <NavigationContainer
     // linking={deepLinking}
@@ -215,7 +221,7 @@ const StackNavigator = (props) => {
       <Drawer.Navigator
         activeBackgroundColor={'#000'}
         drawerContent={(props) => <DrawerContent {...props} />}
-        initialRouteName={'Ordenes'}
+        initialRouteName={initialRoute}
         drawerContentOptions={{
           activeTintColor: '#000',
           activeBackgroundColor: '#000',

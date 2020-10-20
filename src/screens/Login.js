@@ -150,11 +150,9 @@ export default class Login extends Component {
     let result = await bcrypt.compareSync(text, this.state.hashDB);
 
     if (result === true) {
-        console.log('paso disponible del if por aqui... ');
         this.assignValues();
     }
     else {
-        console.log('paso cerrado del if por aqui...');
         this.accessIncorrect();
     }
 
@@ -172,6 +170,14 @@ export default class Login extends Component {
   async assignValues() {
     await AsyncStorage.setItem('user_id', JSON.stringify(this.state.contentUser.id));
     await AsyncStorage.setItem('user_name', this.state.contentUser.name);
+    await AsyncStorage.setItem('number_of_restaurants', JSON.stringify(this.state.contentUser.number_of_restaurants));
+
+    if(this.state.contentUser.number_of_restaurants === 1){
+      await this.fetchUniqueRestaurant(this.state.contentUser.id);
+    }
+    else{
+      await AsyncStorage.setItem('user_restaurant', '0');
+    }
 
     if(this.state.contentUser.avatar === '' || this.state.contentUser.avatar === null){
         await AsyncStorage.setItem('user_img', 'image');
@@ -187,6 +193,37 @@ export default class Login extends Component {
     this.setState({
       stateModal: false,
     });
+  }
+
+  
+  async fetchUniqueRestaurant(idUser){
+    let collection = {};
+    let restaurantId = '';
+
+    collection.user_id = idUser;
+
+    const url = webApi + '/users/fetch_unique_restaurant';
+
+    await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(collection),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .catch((error) => {
+        this.setState({
+          stateModal: false,
+        });
+      })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        console.log('verificando... ', responseJson)
+
+        restaurantId = JSON.stringify(responseJson[0].restaurant_id);
+      });
+
+      await AsyncStorage.setItem('user_restaurant', restaurantId);
   }
 
   render() {
@@ -249,6 +286,7 @@ export default class Login extends Component {
                   <TextInput
                     style={styles.inputStyle}
                     placeholder={this.props.dataLogin.lblEmail}
+                    autoCompleteType={'email'}
                     placeholderTextColor="darkblue"
                     autoCapitalize="none"
                     keyboardType="default"

@@ -1,14 +1,15 @@
 import React from 'react';
-import { View, StyleSheet, Alert, Switch, RefreshControl, ImageBackground} from 'react-native';
+import { View, StyleSheet, RefreshControl, ImageBackground, TouchableOpacity, Alert } from 'react-native';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import { CommonActions, } from '@react-navigation/native';
 import Animated from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Right } from 'native-base';
-import { Thumbnail, Spinner, Text, Button } from 'native-base';
-import { webApi } from './constants/Utils';
-//import {EventRegister} from 'react-native-event-listeners';
+import Icons from 'react-native-vector-icons/FontAwesome5';
+import { Thumbnail, Spinner, Text, Left, Body, Right } from 'native-base';
+import { webApi, domain } from './constants/Utils';
+import { EventRegister } from 'react-native-event-listeners';
 import AsyncStorage from '@react-native-community/async-storage';
+import * as Animatable from 'react-native-animatable';
 //import messaging from '@react-native-firebase/messaging';
 
 export default class DrawerContent extends React.Component {
@@ -24,16 +25,22 @@ export default class DrawerContent extends React.Component {
             isRefreshing: false,
             user_id: null,
             user_name: '',
-            user_restaurant: null,
+            user_restaurant: '',
             user_img: '',
             user_email: '',
-            user_restaurant_name: ''
+            user_restaurant_name: '',
+            user_image: ''
         };
     }
 
     componentDidMount() {
 
         this.getData();
+
+        EventRegister.addEventListener('reloadDataDrawerContent', (data) => {
+            console.log('paso por el event register de drawer content... ');
+            this.onRefresh;
+          });
     }
 
     onRefresh = (event) => {
@@ -93,12 +100,6 @@ export default class DrawerContent extends React.Component {
             }),
         );
 
-        // esta estatico de momento...
-        await AsyncStorage.getItem('user_img').then((value) =>
-            this.setState({
-                user_img: 'https://static.vecteezy.com/system/resources/previews/000/566/937/non_2x/vector-person-icon.jpg',
-            }),
-        );
 
         await AsyncStorage.getItem('user_email').then((value) =>
             this.setState({
@@ -106,67 +107,83 @@ export default class DrawerContent extends React.Component {
             }),
         );
 
-        await AsyncStorage.getItem('user_restaurant').then((value) => {
-            if (value != null) {
-                this.setState({
-                    user_restaurant: value,
-                });
-
-                this.getApiData(this.state.user_restaurant);
-            }
-        });
-    }
-
-    getApiData(idRestaurant) {
-        return fetch(webApi + '/restaurant/' + idRestaurant)
-            .then((response) => response.json())
-            .then((responseJson) => {
-                this.setState({
-                    isLoading: false,
-                    dataRestaurant: responseJson,
-                });
-
-                this.setState({ user_restaurant_name: this.state.dataRestaurant[0].restaurant_name });
-
-                if (this.state.dataRestaurant[0].restaurant_status == 1) {
-                    this.setState({ switchValue: true, estadoTienda: 'Disponible' });
-
-                } else {
-                    this.setState({ switchValue: false, estadoTienda: 'No Disponible' });
-
-                }
-            })
-            .catch((error) => {
-                console.error(error);
+        await AsyncStorage.getItem('user_img').then((value) => {
+            this.setState({
+                user_image: value
             });
+        });
+
+
+        await AsyncStorage.getItem('user_restaurant').then((value) => {
+            this.setState({
+                user_restaurant: value
+            });
+        });
+
+        this.setState({
+            isLoading: false,
+        });
+        // await AsyncStorage.getItem('user_restaurant').then((value) => {
+        //     if (value != null) {
+        //         this.setState({
+        //             user_restaurant: value,
+        //         });
+
+        //         this.getApiData(this.state.user_restaurant);
+        //     }
+        // });
     }
+
+    // getApiData(idRestaurant) {
+    //     return fetch(webApi + '/restaurant/' + idRestaurant)
+    //         .then((response) => response.json())
+    //         .then((responseJson) => {
+    //             this.setState({
+    //                 isLoading: false,
+    //                 dataRestaurant: responseJson,
+    //             });
+
+    //             this.setState({ user_restaurant_name: this.state.dataRestaurant[0].restaurant_name });
+
+    //             if (this.state.dataRestaurant[0].restaurant_status == 1) {
+    //                 this.setState({ switchValue: true, estadoTienda: 'Disponible' });
+
+    //             } else {
+    //                 this.setState({ switchValue: false, estadoTienda: 'No Disponible' });
+
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             console.error(error);
+    //         });
+    // }
 
     signOut = () => {
-        // Alert.alert(
-        //   'Alerta',
-        //   '¿Deseas cerrar sesión?',
-        //   [
-        //     {
-        //       text: 'Cancelar',
-        //       onPress: () => {
-        //         return null;
-        //       },
-        //     },
-        //     {
-        //       text: 'Cerrar Sesión',
-        //       onPress: () => {
-        //         AsyncStorage.clear();
+        Alert.alert(
+            'Alerta',
+            '¿Deseas cerrar sesión?',
+            [
+                {
+                    text: 'Cancelar',
+                    onPress: () => {
+                        return null;
+                    },
+                },
+                {
+                    text: 'Cerrar Sesión',
+                    onPress: () => {
+                        AsyncStorage.clear();
 
 
-        //         this.deleteToken();
+                        //this.deleteToken();
 
-        //         EventRegister.emit('logOut', true);
+                        EventRegister.emit('logOut', true);
 
-        //       },
-        //     },
-        //   ],
-        //   {cancelable: false},
-        // );
+                    },
+                },
+            ],
+            { cancelable: false },
+        );
     };
 
     async deleteToken() {
@@ -195,6 +212,90 @@ export default class DrawerContent extends React.Component {
         //   .then((response) => {
         //     console.log('Token deleted... ');
         //   });
+    }
+
+    // This help us to know if the user has a picture or not... 
+    // If the user doesn't have a picture, we add one...
+    thumbnail() {
+
+        if (this.state.user_image === 'image') {
+            return (
+                <Thumbnail marginTop={30} large source={require('./img/avatar.jpg')} />
+            );
+        }
+        else {
+            let imageUri = domain + '/' + this.state.user_image;
+            return (
+                <Thumbnail marginTop={30} large
+                    source={{ uri: imageUri }} />
+            );
+        }
+    }
+
+    contentInDrawer() {
+        if (this.state.user_restaurant != 0) {
+            return (
+                <View style={styles.bottomDrawerSection}>
+                    <DrawerItem
+                        icon={({ color, size }) => (
+                            <Icon name="user-circle" color={color} size={size} />
+                        )}
+                        label="Cuenta   "
+                        onPress={() => {
+                            this.props.navigation.navigate('Cuenta');
+                        }}
+                    />
+
+                    <DrawerItem
+                        icon={({ color, size }) => (
+                            <Icon name="list-alt" color={color} size={size} />
+                        )}
+                        label="Ordenes   "
+                        onPress={() => {
+                            this.props.navigation.navigate('Ordenes');
+                            //EventRegister.emit('changeTab', 3);
+                        }}
+                    />
+
+                    <DrawerItem
+                        icon={({ color, size }) => (
+                            <Icon name="dashboard" color={color} size={size} />
+                        )}
+                        label="Menú    "
+                        onPress={() => {
+                            this.props.navigation.navigate('Servicios');
+                        }}
+                    />
+                </View>
+            );
+        }
+        else {
+            return (
+                <View style={{ flex: 1, alignItems: 'center' }}>
+                    <Text style={{
+                        marginLeft: 20,
+                        marginRight: 20,
+                        marginTop: 30,
+                        marginBottom: 50,
+                        textAlign: 'center',
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        color: '#086879'
+                    }}>
+                        Selecciona un restaurante para ver las opciones...
+                    </Text>
+
+                    <Animatable.View
+                        animation="pulse"
+                        easing="ease"
+                        iterationCount="infinite"
+                    >
+                        <Icons name="sad-tear" style={{ fontSize: 55, marginRight: 20 }} color={'#77D5E5'} />
+                    </Animatable.View>
+                </View>
+
+            );
+        }
     }
 
     render() {
@@ -226,70 +327,76 @@ export default class DrawerContent extends React.Component {
                         }>
 
                         <View style={styles.drawerContent}>
-                            <ImageBackground source={require('./img/DrawerContent.jpg')} 
+                            <ImageBackground source={require('./img/DrawerContent.jpg')}
                                 style={styles.image}>
                                 <View style={styles.userInfoSection}>
                                     <View style={{ alignItems: 'center' }}>
-                                        <Thumbnail marginTop={30} large source={{ uri: imageUri }} />
+                                        {this.thumbnail()}
                                     </View>
 
                                     <View style={{ alignItems: 'center' }}>
                                         <Text style={styles.userName}>{this.state.user_name}</Text>
 
-                                        <Text style={styles.titleRestaurant}>
-                                            {this.state.user_restaurant_name}
-                                        </Text>
                                     </View>
 
-                                    <View style={{}}>
-                                        <Button
-                                            rounded
-                                            danger
-                                            style={{ width: 140, height: 25, marginBottom: 10 }}
-                                            onPress={() => this.signOut()}>
-                                            <Text style={{ fontSize: 10 }}>Cerrar Sesión </Text>
-                                            <Icon name="sign-out" color={'#fff'} />
-                                        </Button>
+                                    <View style={{ alignItems: 'center' }}>
+                                        <Text
+                                            style={{
+                                                fontSize: 15,
+                                                color: 'lightgreen',
+                                                marginTop: 0,
+                                                marginBottom: 15
+                                            }}>
+                                            {this.state.user_email}
+                                        </Text>
+
                                     </View>
                                 </View>
                             </ImageBackground>
 
-                            <View style={styles.bottomDrawerSection}>
-                                <DrawerItem
-                                    icon={({ color, size }) => (
-                                        <Icon name="user-circle" color={color} size={size} />
-                                    )}
-                                    label="Cuenta   "
-                                    onPress={() => {
-                                        this.props.navigation.navigate('Cuenta');
-                                    }}
-                                />
-
-                                <DrawerItem
-                                    icon={({ color, size }) => (
-                                        <Icon name="list-alt" color={color} size={size} />
-                                    )}
-                                    label="Ordenes   "
-                                    onPress={() => {
-                                        this.props.navigation.navigate('Ordenes');
-                                        //EventRegister.emit('changeTab', 3);
-                                    }}
-                                />
-
-                                <DrawerItem
-                                    icon={({ color, size }) => (
-                                        <Icon name="dashboard" color={color} size={size} />
-                                    )}
-                                    label="Menú    "
-                                    onPress={() => {
-                                        this.props.navigation.navigate('Servicios');
-                                    }}
-                                />
-                            </View>
+                            {this.contentInDrawer()}
                         </View>
                     </DrawerContentScrollView>
 
-                    <View style={styles.statusSection}>
+
+                    <TouchableOpacity
+                        style={{
+                            justifyContent: 'center',
+                            alignItems: "center",
+                            backgroundColor: "#DC5656",
+                            padding: 10,
+                            flexDirection: 'row'
+                        }}
+                        onPress={() => this.signOut()}
+                    >
+                        <Left style={{ minWidth: 125 }}>
+                            <Text style={{
+                                marginTop: 5,
+                                marginBottom: 5,
+                                color: 'white',
+                                fontWeight: 'bold',
+                                marginRight: 20,
+                                marginLeft: 20
+                            }}>
+                                Cerrar Sesión
+                            </Text>
+                        </Left>
+
+                        <Right>
+                            <Icon name="sign-out" style={{ fontSize: 15, marginRight: 20 }} color={'#fff'} />
+                        </Right>
+                    </TouchableOpacity>
+
+                    {/* <Button
+                            danger
+                            style={{  justifyContent: 'center', alignItems: 'center' }}
+                            onPress={() => this.signOut()}>
+                            <Text style={{ fontSize: 10 }}>Cerrar Sesión </Text>
+                            <Icon name="sign-out" color={'#fff'} />
+                        </Button> */}
+
+
+                    {/* <View style={styles.statusSection}>
                         <View style={{ flexDirection: 'row' }}>
                             <Text style={styles.estado}> {this.state.estadoTienda} </Text>
 
@@ -306,7 +413,7 @@ export default class DrawerContent extends React.Component {
                                 />
                             </Right>
                         </View>
-                    </View>
+                    </View> */}
                 </Animated.View>
             );
         }
@@ -352,10 +459,6 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         borderTopColor: '#f4f4f4',
         borderTopWidth: 1,
-    },
-    statusSection: {
-        marginBottom: 0,
-        backgroundColor: '#0D1D41',
     },
     preference: {
         flexDirection: 'row',

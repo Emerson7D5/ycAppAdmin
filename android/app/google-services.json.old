@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "80475313739",
+    "firebase_url": "https://yocomproencande-c9cfe.firebaseio.com",
+    "project_id": "yocomproencande-c9cfe",
+    "storage_bucket": "yocomproencande-c9cfe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:80475313739:android:fa193c6687357319d9dfce",
+        "android_client_info": {
+          "package_name": "com.yocomproadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "80475313739-0mhqvp9g4240682npm64fubuaco46dgf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZfntjnOne3GqnhhGT4myUfGq0m9q3k24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "80475313739-0mhqvp9g4240682npm64fubuaco46dgf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

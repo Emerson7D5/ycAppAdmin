@@ -53,7 +53,7 @@ export default class Ordenes extends React.Component {
     this.state = {
       recordDataOrder: [],
       openDataOrder: [],
-      isRefreshing: true,
+      isRefreshing: false,
       didUpdate: false,
       is_updated: false,
       initialPageTab: 0,
@@ -61,6 +61,7 @@ export default class Ordenes extends React.Component {
       mounted: false,
       count: 0,
       isCounting: true,
+      isLoading: true 
     };
   }
 
@@ -88,12 +89,28 @@ export default class Ordenes extends React.Component {
       }
     });
 
+    this.listener = EventRegister.addEventListener(
+      'newOrder_Orders',
+      (restaurantId) => {
+        this.sendingOtherId(restaurantId);
+        console.log('paso por event register en Ordenes.js');
+        this.probando();
+      },
+    );
+
     this.myInterval = setInterval(() => {
       this.setState((prevState) => ({
         count: prevState.count + 1,
       }));
-      
     }, 60000);
+  }
+
+  async probando(){
+    await AsyncStorage.getItem('user_restaurant').then((value) => {
+      if (value != null) {
+        console.log('hey, este es.... ', value);
+      }
+    });
   }
 
   onRefresh = (event) => {
@@ -103,6 +120,17 @@ export default class Ordenes extends React.Component {
 
     this.refreshData();
   };
+
+  async sendingOtherId(idNewOrder){
+    await this.setState({
+      isLoading: true,
+    });
+
+    await this.setState({ user_store: idNewOrder});
+
+
+    this.refreshData();
+  }
 
   async refreshData() {
     await this.getOpenDataOrders();
@@ -135,6 +163,7 @@ export default class Ordenes extends React.Component {
         this.setState({
           recordDataOrder: responseJson[0],
           isRefreshing: false,
+          isLoading: false
         });
       })
       .catch((error) => {
@@ -336,69 +365,89 @@ export default class Ordenes extends React.Component {
       return a.order_creation_date > b.order_creation_date;
     });
 
+    console.log('los parametros dentro de ordenes...', this.props.route);
+
     // this.state.dataOrderNew.sort(function (a, b) {
     //   return a.order_creation_date > b.order_creation_date;
     // });
 
-    return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView
-          contentContainerStyle={styles.scrollView}
-          refreshControl={
-            <RefreshControl
-              refreshing={this.state.isRefreshing}
-              onRefresh={this.onRefresh}
-            />
-          }>
-          <Content style={{backgroundColor: '#021136'}}>
-            <Tabs
-              style={{backgroundColor: '#021136'}}
-              tabBarInactiveTextColor={'#fff'}
-              initialPage={this.state.initialPageTab}
-              onChangeTab={this.changingTab}>
-              <Tab
-                heading={
-                  <TabHeading style={{backgroundColor: '#021136'}}>
-                    <Icon name="bell" color={'white'} />
-                    <Text>Nuevas</Text>
-                  </TabHeading>
-                }>
-                <TabNewOrders
-                  dataOrder={this.state.openDataOrder}
-                  {...this.props}
-                />
-              </Tab>
+    if (this.state.isLoading) {
+      return (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', width: win.width -20}}>
+          <Bar indeterminate={true} width={150} color={'orange'} />
+          <Text
+            style={{
+              fontSize: 20,
+              marginTop: 20,
+              marginRight: 20,
+              marginLeft: 20,
+              textAlign: 'center'
+            }}>
+            Cargando Ordenes...
+          </Text>
+        </View>
+      )
+    } else {
+      return (
+        <SafeAreaView style={styles.container}>
+          <ScrollView
+            contentContainerStyle={styles.scrollView}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.isRefreshing}
+                onRefresh={this.onRefresh}
+              />
+            }>
+            <Content style={{backgroundColor: '#021136'}}>
+              <Tabs
+                style={{backgroundColor: '#021136'}}
+                tabBarInactiveTextColor={'#fff'}
+                initialPage={this.state.initialPageTab}
+                onChangeTab={this.changingTab}>
+                <Tab
+                  heading={
+                    <TabHeading style={{backgroundColor: '#021136'}}>
+                      <Icon name="bell" color={'white'} />
+                      <Text>Nuevas</Text>
+                    </TabHeading>
+                  }>
+                  <TabNewOrders
+                    dataOrder={this.state.openDataOrder}
+                    {...this.props}
+                  />
+                </Tab>
 
-              <Tab
-                heading={
-                  <TabHeading style={{backgroundColor: '#021136'}}>
-                    <Icon name="tasks" color={'white'} />
-                    <Text>En Proceso</Text>
-                  </TabHeading>
-                }>
-                <TabProcessOrders
-                  dataOrder={this.state.openDataOrder}
-                  {...this.props}
-                />
-              </Tab>
+                <Tab
+                  heading={
+                    <TabHeading style={{backgroundColor: '#021136'}}>
+                      <Icon name="tasks" color={'white'} />
+                      <Text>En Proceso</Text>
+                    </TabHeading>
+                  }>
+                  <TabProcessOrders
+                    dataOrder={this.state.openDataOrder}
+                    {...this.props}
+                  />
+                </Tab>
 
-              <Tab
-                heading={
-                  <TabHeading style={{backgroundColor: '#021136'}}>
-                    <Icon name="book" color={'white'} />
-                    <Text>Historial</Text>
-                  </TabHeading>
-                }>
-                <TabRecordOrders
-                  dataOrder={this.state.recordDataOrder}
-                  {...this.props}
-                />
-              </Tab>
-            </Tabs>
-          </Content>
-        </ScrollView>
-      </SafeAreaView>
-    );
+                <Tab
+                  heading={
+                    <TabHeading style={{backgroundColor: '#021136'}}>
+                      <Icon name="book" color={'white'} />
+                      <Text>Historial</Text>
+                    </TabHeading>
+                  }>
+                  <TabRecordOrders
+                    dataOrder={this.state.recordDataOrder}
+                    {...this.props}
+                  />
+                </Tab>
+              </Tabs>
+            </Content>
+          </ScrollView>
+        </SafeAreaView>
+      );
+    }
   }
 }
 
