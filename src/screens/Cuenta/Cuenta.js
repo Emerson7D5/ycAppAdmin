@@ -61,7 +61,15 @@ export default class Cuenta extends React.Component {
 
         this.setState({
             mounted: true,
-        })
+        });
+
+        this.listener = this.props.navigation.addListener('focus', () => {
+            this.setState({
+                isRefreshing: true,
+            });
+
+            this.recargar();
+          });
 
     }
 

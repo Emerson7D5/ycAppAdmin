@@ -207,8 +207,6 @@ const OrdenesStackScreen = ({ navigation }) => (
 
 
 const StackNavigator = (props) => {
-
-  console.log('los props dentro del stacknavigator... ', props);
   
   let initialRoute = props.restaurants.initialRoute;
 

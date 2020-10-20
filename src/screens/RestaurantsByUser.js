@@ -52,6 +52,10 @@ export default class RestaurantsByUser extends React.Component {
 
     await this.getData();
 
+    this.listener = this.props.navigation.addListener('focus', () => {
+      this.changeDrawerContent();
+    });
+
     
     // This is called from DetailRestaurantByUser, helping to go to Orders.
     this.listener = EventRegister.addEventListener(
@@ -59,11 +63,9 @@ export default class RestaurantsByUser extends React.Component {
       (restaurantId) => {
         if(this.state.countingTimes === 0){
             this.goToOrders(restaurantId);
-            console.log('paso por event register en restaurantsbyuser.js');
             this.setState({countingTimes: this.state.countingTimes + 1});
         }
         else {
-            EventRegister.emit('reloadDataDrawerContent', true);
             EventRegister.emit('newOrder_Orders', restaurantId);
             
             this.goToOrders(restaurantId);
@@ -77,8 +79,15 @@ export default class RestaurantsByUser extends React.Component {
   async goToOrders(restaurantId) {
       
     await AsyncStorage.setItem('user_restaurant', JSON.stringify(restaurantId));
-    //console.log()
+    await EventRegister.emit('reloadDC');
+
     this.props.navigation.navigate('Ordenes', {parameter: 2020});
+  }
+
+  // this function change the restaurant_id to 0 and makes DrawerContent to reload Content... 
+  async changeDrawerContent(){
+    await AsyncStorage.setItem('user_restaurant', '0');
+    await EventRegister.emit('reloadDC');
   }
 
   async getData() {
@@ -103,7 +112,6 @@ export default class RestaurantsByUser extends React.Component {
       count++;
     });
 
-    console.log(JSON.stringify(elements));
 
     // if (count === 1) {
     //   await this.goToOrders(elements[0].restaurant_id);

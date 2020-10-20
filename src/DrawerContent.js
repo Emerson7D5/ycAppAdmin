@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import * as Animatable from 'react-native-animatable';
 //import messaging from '@react-native-firebase/messaging';
 
+
 export default class DrawerContent extends React.Component {
     constructor(props) {
         super(props);
@@ -33,14 +34,20 @@ export default class DrawerContent extends React.Component {
         };
     }
 
+    
+
     componentDidMount() {
 
         this.getData();
 
-        EventRegister.addEventListener('reloadDataDrawerContent', (data) => {
-            console.log('paso por el event register de drawer content... ');
-            this.onRefresh;
+        this.listener = EventRegister.addEventListener('reloadDC', () => {
+            this.setState({
+                isRefreshing: true,
+            });
+
+            this.recargar();
           });
+        
     }
 
     onRefresh = (event) => {
