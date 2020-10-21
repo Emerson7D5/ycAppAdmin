@@ -53,8 +53,6 @@ export default class App extends React.Component {
   async componentDidMount() {
     await setTimeout(
       () => {
-        // Comentada mientras el login no sirve
-        //NetInfo.addEventListener(this.handleConnectivityChange);
         this.loginProcess();
       },
       2000,
@@ -67,11 +65,26 @@ export default class App extends React.Component {
     });
 
     EventRegister.addEventListener('logOut', (data) => {
-      this.setState({
-        stateLogin: true,
-        userValidation: true,
-      });
+      this.logOutProccess();
     });
+  }
+
+  async logOutProccess() {
+    this.setState({
+      userValidation: false
+    });
+
+    let inf = await FetchLoginInfo();
+
+    await this.setState({
+      infoLogin: inf
+    });
+
+    await this.setState({
+      stateLogin: true,
+      userValidation: true,
+    });
+
   }
 
   async loginCorrectly() {
@@ -121,10 +134,6 @@ export default class App extends React.Component {
 
   // Mientras no funciona el login...
   async loginProcess() {
-    //await AsyncStorage.clear();
-
-    // await AsyncStorage.setItem('user_id', '4');
-    // await AsyncStorage.setItem('user_name', 'Administrador');
 
     await AsyncStorage.getItem('number_of_restaurants').then((value) => {
       if (value != null) {
@@ -134,16 +143,9 @@ export default class App extends React.Component {
       }
     });
 
-    if (this.state.initialRoute === 'RestaurantsByUser'){
+    if (this.state.initialRoute === 'RestaurantsByUser') {
       await AsyncStorage.setItem('user_restaurant', '0');
     }
-    //PENDIENTE
-    //await AsyncStorage.setItem('user_restaurant', '0');
-
-    // await AsyncStorage.setItem('user_img', 'image');
-    // await AsyncStorage.setItem('user_email', 'admin_tiendas@yocomproencande.com');
-
-    //EventRegister.emit('loginCorrectly', true);
 
     NetInfo.addEventListener(this.handleConnectivityChange);
     await this.verifyingUserIdentity();

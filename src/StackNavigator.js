@@ -10,6 +10,7 @@ import DeliveryAssigned from '@Details/DeliveryAssigned';
 import RecordOrder from '@Details/RecordOrder';
 import Cuenta from '@Cuenta/Cuenta';
 import DrawerContent from './DrawerContent';
+import Items from '@Items/Items';
 
 import { EventRegister } from 'react-native-event-listeners';
 
@@ -21,11 +22,52 @@ import RestaurantsByUser from './screens/RestaurantsByUser';
 const OrdenesStack = createStackNavigator();
 const RestaurantsByUserStack = createStackNavigator();
 const CuentaStack = createStackNavigator();
-// const NuevaOrdenStack = createStackNavigator();
-// const OrdenCreadaStack = createStackNavigator();
-// const ServiciosStack = createStackNavigator();
+const ItemsStack = createStackNavigator();
+
 
 const Drawer = createDrawerNavigator();
+
+const ItemsStackScreen = ({ navigation }) => (
+  <ItemsStack.Navigator
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: '#021136',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    }}>
+    <ItemsStack.Screen
+      name="Items"
+      component={Items}
+      options={{
+        title: 'Items',
+        headerLeft: () => (
+          <Icon.Button
+            name="bars"
+            size={25}
+            backgroundColor="transparent"
+            color="#fff"
+            onPress={() => {
+              navigation.openDrawer();
+            }}></Icon.Button>
+        ),
+        headerRight: () => (
+          <Icon.Button
+            name="refresh"
+            size={25}
+            backgroundColor={null}
+            color="#fff"
+            onPress={() => {
+              EventRegister.emit('refreshItems');
+            }}></Icon.Button>
+        )
+      }}
+    />
+  </ItemsStack.Navigator>
+);
+
 
 const RestaurantsByUserStackScreen = ({ navigation }) => (
   <RestaurantsByUserStack.Navigator
@@ -231,6 +273,7 @@ const StackNavigator = (props) => {
         />
         <Drawer.Screen name="Ordenes" component={OrdenesStackScreen} />
         <Drawer.Screen name="RestaurantsByUser" component={RestaurantsByUserStackScreen} />
+        <Drawer.Screen name="Items" component={ItemsStackScreen} />
 
       </Drawer.Navigator>
     </NavigationContainer>

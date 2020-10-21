@@ -19,7 +19,6 @@ export default class DrawerContent extends React.Component {
         this.state = {
             switchValue: false,
             estadoTienda: 'Cerrado',
-            dataStore: [],
             isLoading: true,
             isChanging: false,
             taskCreated: false,
@@ -30,11 +29,12 @@ export default class DrawerContent extends React.Component {
             user_img: '',
             user_email: '',
             user_restaurant_name: '',
-            user_image: ''
+            user_image: '',
+            numberOfRestaurants: ''
         };
     }
 
-    
+
 
     componentDidMount() {
 
@@ -46,8 +46,8 @@ export default class DrawerContent extends React.Component {
             });
 
             this.recargar();
-          });
-        
+        });
+
     }
 
     onRefresh = (event) => {
@@ -127,43 +127,17 @@ export default class DrawerContent extends React.Component {
             });
         });
 
+
+        await AsyncStorage.getItem('number_of_restaurants').then((value) => {
+            this.setState({
+                numberOfRestaurants: value
+            });
+        });
+
         this.setState({
             isLoading: false,
         });
-        // await AsyncStorage.getItem('user_restaurant').then((value) => {
-        //     if (value != null) {
-        //         this.setState({
-        //             user_restaurant: value,
-        //         });
-
-        //         this.getApiData(this.state.user_restaurant);
-        //     }
-        // });
     }
-
-    // getApiData(idRestaurant) {
-    //     return fetch(webApi + '/restaurant/' + idRestaurant)
-    //         .then((response) => response.json())
-    //         .then((responseJson) => {
-    //             this.setState({
-    //                 isLoading: false,
-    //                 dataRestaurant: responseJson,
-    //             });
-
-    //             this.setState({ user_restaurant_name: this.state.dataRestaurant[0].restaurant_name });
-
-    //             if (this.state.dataRestaurant[0].restaurant_status == 1) {
-    //                 this.setState({ switchValue: true, estadoTienda: 'Disponible' });
-
-    //             } else {
-    //                 this.setState({ switchValue: false, estadoTienda: 'No Disponible' });
-
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             console.error(error);
-    //         });
-    // }
 
     signOut = () => {
         Alert.alert(
@@ -239,6 +213,22 @@ export default class DrawerContent extends React.Component {
         }
     }
 
+    restaurantOption() {
+        if (this.state.numberOfRestaurants != '1') {
+            return (
+                <DrawerItem
+                    icon={({ color, size }) => (
+                        <Icon name="tasks" color={color} size={size} />
+                    )}
+                    label="Restaurantes    "
+                    onPress={() => {
+                        this.props.navigation.navigate('RestaurantsByUser');
+                    }}
+                />
+            );
+        }
+    }
+
     contentInDrawer() {
         if (this.state.user_restaurant != 0) {
             return (
@@ -268,11 +258,13 @@ export default class DrawerContent extends React.Component {
                         icon={({ color, size }) => (
                             <Icon name="dashboard" color={color} size={size} />
                         )}
-                        label="Menú    "
+                        label="Items    "
                         onPress={() => {
-                            this.props.navigation.navigate('Servicios');
+                            this.props.navigation.navigate('Items');
                         }}
                     />
+
+                    {this.restaurantOption()}
                 </View>
             );
         }

@@ -15,6 +15,7 @@
     "@react-native-community/netinfo": "^5.9.7",
     "@react-native-firebase/app": "^8.4.6",
     "@react-native-firebase/messaging": "^7.9.1",
+    "@react-navigation/bottom-tabs": "^5.9.2",
     "@react-navigation/drawer": "^5.9.3",
     "@react-navigation/native": "^5.7.6",
     "@react-navigation/stack": "^5.9.3",

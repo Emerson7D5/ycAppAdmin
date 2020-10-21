@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
@@ -30,21 +30,21 @@ import TabNewOrders from '@Tabs/TabNewOrders';
 import TabProcessOrders from '@Tabs/TabProcessOrders';
 import TabRecordOrders from '@Tabs/TabRecordOrders';
 
-import {webApi} from '../../constants/Utils';
-import {EventRegister} from 'react-native-event-listeners';
+import { webApi } from '../../constants/Utils';
+import { EventRegister } from 'react-native-event-listeners';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import {Bar} from 'react-native-progress';
+import { Bar } from 'react-native-progress';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Grid, Col} from 'react-native-easy-grid';
+import { Grid, Col } from 'react-native-easy-grid';
 
 import TimeAgo from 'react-native-timeago';
 import DateFormat from 'dateformat';
 import moment from 'moment';
 import * as Progress from 'react-native-progress';
-import {timing} from 'react-native-reanimated';
+import { timing } from 'react-native-reanimated';
 
-const {width, height} = Dimensions.get('screen');
+const { width, height } = Dimensions.get('screen');
 const win = Dimensions.get('window');
 
 export default class Ordenes extends React.Component {
@@ -61,7 +61,7 @@ export default class Ordenes extends React.Component {
       mounted: false,
       count: 0,
       isCounting: true,
-      isLoading: true 
+      isLoading: true
     };
   }
 
@@ -77,35 +77,37 @@ export default class Ordenes extends React.Component {
     await this.getOpenDataOrders();
     await this.getRecordDataOrders();
 
-    this.setState({mounted: true});
+    await this.setState({ mounted: true });
 
-    this.listener = EventRegister.addEventListener('reloadTabsData', () => {
-      if (this.state.mounted === true) {
-        this.setState({
-          isRefreshing: true,
-        });
+    if (this.state.mounted) {
+      this.listener = EventRegister.addEventListener('reloadTabsData', () => {
+        if (this.state.mounted === true) {
+          this.setState({
+            isRefreshing: true,
+          });
 
-        this.refreshData();
-      }
-    });
+          this.refreshData();
+        }
+      });
 
-    this.listener = EventRegister.addEventListener(
-      'newOrder_Orders',
-      (restaurantId) => {
-        this.sendingOtherId(restaurantId);
-        console.log('paso por event register en Ordenes.js');
-        this.probando();
-      },
-    );
+      this.listener = EventRegister.addEventListener(
+        'newOrder_Orders',
+        (restaurantId) => {
+          this.sendingOtherId(restaurantId);
+          console.log('paso por event register en Ordenes.js');
+          this.probando();
+        },
+      );
 
-    this.myInterval = setInterval(() => {
-      this.setState((prevState) => ({
-        count: prevState.count + 1,
-      }));
-    }, 60000);
+      this.myInterval = setInterval(() => {
+        this.setState((prevState) => ({
+          count: prevState.count + 1,
+        }));
+      }, 60000);
+    }
   }
 
-  async probando(){
+  async probando() {
     await AsyncStorage.getItem('user_restaurant').then((value) => {
       if (value != null) {
         console.log('hey, este es.... ', value);
@@ -121,12 +123,12 @@ export default class Ordenes extends React.Component {
     this.refreshData();
   };
 
-  async sendingOtherId(idNewOrder){
+  async sendingOtherId(idNewOrder) {
     await this.setState({
       isLoading: true,
     });
 
-    await this.setState({ user_store: idNewOrder});
+    await this.setState({ user_store: idNewOrder });
 
 
     this.refreshData();
@@ -229,9 +231,9 @@ export default class Ordenes extends React.Component {
         return (
           <TouchableOpacity
             key={dataContent._id}
-            onPress={() => navigate(screen, {dataContent})}>
-            <Card style={{marginLeft: 5, marginRight: 5}}>
-              <CardItem header bordered style={{backgroundColor: colorTime}}>
+            onPress={() => navigate(screen, { dataContent })}>
+            <Card style={{ marginLeft: 5, marginRight: 5 }}>
+              <CardItem header bordered style={{ backgroundColor: colorTime }}>
                 <Body>
                   <View
                     style={{
@@ -247,7 +249,7 @@ export default class Ordenes extends React.Component {
                     </Text>
                   </View>
                 </Body>
-                <Right style={{borderColor: 'white'}}>
+                <Right style={{ borderColor: 'white' }}>
                   <View
                     style={{
                       borderColor: 'white',
@@ -267,14 +269,14 @@ export default class Ordenes extends React.Component {
                         justifyContent: 'center',
                         fontWeight: 'bold',
                       }}>
-                      <TimeAgo style={{justifyContent: 'center'}} time={date} />
+                      <TimeAgo style={{ justifyContent: 'center' }} time={date} />
                     </Text>
                   </View>
                 </Right>
               </CardItem>
 
               <CardItem bordered>
-                <Body style={{justifyContent: 'center'}}>
+                <Body style={{ justifyContent: 'center' }}>
                   <View
                     style={{
                       justifyContent: 'center',
@@ -283,7 +285,7 @@ export default class Ordenes extends React.Component {
                     }}>
                     <Grid>
                       <Col></Col>
-                      <Col style={{width: 270}}>
+                      <Col style={{ width: 270 }}>
                         <Row>
                           <Left>
                             <Text
@@ -337,8 +339,8 @@ export default class Ordenes extends React.Component {
                             width: 140,
                             alignItems: 'center',
                           }}
-                          onPress={() => navigate(screen, {dataContent})}>
-                          <Text style={{fontWeight: 'bold'}}>
+                          onPress={() => navigate(screen, { dataContent })}>
+                          <Text style={{ fontWeight: 'bold' }}>
                             Ver detalle...
                           </Text>
                         </Button>
@@ -356,7 +358,7 @@ export default class Ordenes extends React.Component {
   };
 
   render() {
-    const {navigate} = this.props.navigation;
+    const { navigate } = this.props.navigation;
     require('moment/locale/es');
     moment.locale('es');
 
@@ -365,15 +367,13 @@ export default class Ordenes extends React.Component {
       return a.order_creation_date > b.order_creation_date;
     });
 
-    console.log('los parametros dentro de ordenes...', this.props.route);
-
     // this.state.dataOrderNew.sort(function (a, b) {
     //   return a.order_creation_date > b.order_creation_date;
     // });
 
     if (this.state.isLoading) {
       return (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', width: win.width -20}}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', width: win.width - 20 }}>
           <Bar indeterminate={true} width={150} color={'orange'} />
           <Text
             style={{
@@ -398,15 +398,15 @@ export default class Ordenes extends React.Component {
                 onRefresh={this.onRefresh}
               />
             }>
-            <Content style={{backgroundColor: '#021136'}}>
+            <Content style={{ backgroundColor: '#021136' }}>
               <Tabs
-                style={{backgroundColor: '#021136'}}
+                style={{ backgroundColor: '#021136' }}
                 tabBarInactiveTextColor={'#fff'}
                 initialPage={this.state.initialPageTab}
                 onChangeTab={this.changingTab}>
                 <Tab
                   heading={
-                    <TabHeading style={{backgroundColor: '#021136'}}>
+                    <TabHeading style={{ backgroundColor: '#021136' }}>
                       <Icon name="bell" color={'white'} />
                       <Text>Nuevas</Text>
                     </TabHeading>
@@ -419,7 +419,7 @@ export default class Ordenes extends React.Component {
 
                 <Tab
                   heading={
-                    <TabHeading style={{backgroundColor: '#021136'}}>
+                    <TabHeading style={{ backgroundColor: '#021136' }}>
                       <Icon name="tasks" color={'white'} />
                       <Text>En Proceso</Text>
                     </TabHeading>
@@ -432,7 +432,7 @@ export default class Ordenes extends React.Component {
 
                 <Tab
                   heading={
-                    <TabHeading style={{backgroundColor: '#021136'}}>
+                    <TabHeading style={{ backgroundColor: '#021136' }}>
                       <Icon name="book" color={'white'} />
                       <Text>Historial</Text>
                     </TabHeading>
